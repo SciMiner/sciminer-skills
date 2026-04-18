@@ -17,6 +17,7 @@ SciMiner 技能集
 - `virtual-screening`：虚拟筛选工作流（小分子与片段库的对接、评分、库生成与高通量筛选）。需要 `SCIMINER_API_KEY`。ClawHub: https://clawhub.ai/sciminer/virtual-screening
 - `small-molecule-design`：小分子生成与优化工作流（从头设计、先导优化、性质约束生成）。需要 `SCIMINER_API_KEY`。ClawHub: https://clawhub.ai/sciminer/small-molecule-design
 - `synthesis-evaluation`：合成规划与评估（逆合成建议、路线评分、可行性与构建块分析）。需要 `SCIMINER_API_KEY`。ClawHub: https://clawhub.ai/sciminer/synthesis-evaluation
+- `optical-chemical-structure-recognition`：光学化学结构识别（从图像或文献图中提取化学结构、图像转 SMILES、结构解析）。需要 `SCIMINER_API_KEY`。ClawHub: https://clawhub.ai/sciminer/optical-chemical-structure-recognition
 
 备注
-- 这些技能依赖 SciMiner API，可能需要 API 凭证。
+- 这些技能依赖 SciMiner API，需要 API key，可以从 https://sciminer.tech/utility 免费获取，在需要时直接粘贴进入OpenClaw或Claude Code的对话框即可。

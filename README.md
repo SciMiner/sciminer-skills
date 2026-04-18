@@ -17,6 +17,7 @@ Skills
 - `virtual-screening`: Virtual screening workflows for small molecules and fragment libraries (docking, scoring, library enumeration, high-throughput screening). Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/sciminer/virtual-screening
 - `small-molecule-design`: Small-molecule generative and optimization workflows (de novo design, lead optimization, property-constrained generation). Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/sciminer/small-molecule-design
 - `synthesis-evaluation`: Synthesis planning and evaluation tools (retrosynthesis suggestions, route scoring, feasibility and building-block analysis). Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/sciminer/synthesis-evaluation
+- `optical-chemical-structure-recognition`: Optical chemical structure recognition (image-to-structure OCR, extract structures from figures or PDFs, image-to-SMILES conversion and parsing). Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/sciminer/optical-chemical-structure-recognition
 
 Notes
-- These skills depend on the SciMiner API and may require API credentials.
+- These skills rely on the SciMiner API and require an API key, which you can obtain for free at https://sciminer.tech/utility and paste into the input box of OpenClaw or Claude code when prompted.
