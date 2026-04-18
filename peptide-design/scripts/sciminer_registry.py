@@ -14,7 +14,8 @@ TOOLS_REGISTRY = {
                     "protein": {"type": "file", "required": True, "description": "Protein structure file (pdb)"},
                     "ligand_smiles": {"type": "string", "required": False, "description": "Ligand SMILES string"},
                     "ligand_file": {"type": "file", "required": False, "description": "Ligand structure file (sdf/pdb)"},
-                    "peptide_sequence": {"type": "string", "required": False, "description": "Peptide sequence"},
+                    "peptide_sequence": {"type": "string", "required": False, "description": "Peptide sequence using one-letter amino-acid codes"},
+                    "is_cyclic": {"type": "boolean", "required": False, "description": "Whether the peptide ligand is cyclic", "default": False},
                     "binding_site": {"type": "string", "required": True, "description": "Binding site center and box size"},
                     "num_mols": {"type": "integer", "required": False, "description": "Number of molecules to generate", "default": 10},
                     "num_steps": {"type": "integer", "required": False, "description": "Number of denoising steps", "default": 100},
@@ -26,22 +27,30 @@ TOOLS_REGISTRY = {
     },
     "PocketXMol SBDD": {
         "provider_name": "PocketXMol",
-        "description": "Design novel drug-like molecules for a protein binding pocket.",
+        "description": "Design small molecules for pocket-based design, fragment linking, or fragment growing.",
         "category": "Peptide Design",
         "interfaces": {
             "default": {
                 "tool_name": "sbdd_gpu_sbdd_gpu_post",
-                "description": "Design drug-like molecules de novo for a protein binding pocket.",
+                "description": "Design novel small molecules with PocketXMol for SBDD, fragment linking, or fragment growing.",
                 "parameters": {
+                    "task_type": {"type": "string", "required": False, "description": "Small-molecule generation task", "enum": ["sbdd", "linking", "growing"], "default": "sbdd"},
                     "mode": {"type": "string", "required": False, "description": "Generation mode", "enum": ["autoregressive", "one_shot"], "default": "autoregressive"},
+                    "fragment_pose_mode": {"type": "string", "required": False, "description": "How to treat input fragment positions for linking/growing", "enum": ["fixed", "free", "small"], "default": "fixed"},
                     "protein": {"type": "file", "required": True, "description": "Protein structure file (pdb)"},
-                    "binding_site": {"type": "string", "required": True, "description": "Binding site center and box size"},
+                    "ligand_file": {"type": "file", "required": False, "description": "Input ligand or fragment structure file for linking or growing"},
+                    "binding_site": {"type": "string", "required": False, "description": "Binding site center and box size"},
+                    "fragment_groups": {"type": "string", "required": False, "description": "Grouped fragment atom indices for linking or growing"},
+                    "anchor_groups": {"type": "string", "required": False, "description": "Optional grouped anchor atom indices for linking"},
+                    "use_input_pose": {"type": "boolean", "required": False, "description": "Whether to start from the uploaded fragment pose", "default": False},
+                    "part1_level_min": {"type": "number", "required": False, "description": "Minimum denoising level for fragment part1", "default": 0},
+                    "init_step": {"type": "number", "required": False, "description": "Initial noise level", "default": 1},
                     "num_atoms": {"type": "integer", "required": False, "description": "Target number of heavy atoms", "default": 28},
                     "num_mols": {"type": "integer", "required": False, "description": "Number of molecules to generate", "default": 10},
                     "num_steps": {"type": "integer", "required": False, "description": "Number of denoising steps", "default": 100},
                     "batch_size": {"type": "integer", "required": False, "description": "Batch size for sampling", "default": 50}
                 },
-                "file_params": ["protein"]
+                "file_params": ["protein", "ligand_file"]
             }
         }
     },
@@ -57,6 +66,7 @@ TOOLS_REGISTRY = {
                     "mode": {"type": "string", "required": False, "description": "Peptide design mode", "enum": ["denovo", "inverse_folding", "sc_packing"], "default": "denovo"},
                     "protein": {"type": "file", "required": True, "description": "Protein structure file (pdb)"},
                     "binding_site": {"type": "string", "required": False, "description": "Binding site center and box size"},
+                    "is_cyclic": {"type": "boolean", "required": False, "description": "Whether to design a cyclic peptide in denovo mode", "default": False},
                     "peptide_length": {"type": "integer", "required": False, "description": "Target peptide length for de novo mode", "default": 10},
                     "peptide_file": {"type": "file", "required": False, "description": "Input peptide structure file for inverse folding or side-chain packing"},
                     "num_mols": {"type": "integer", "required": False, "description": "Number of peptides to generate", "default": 10},
@@ -69,12 +79,12 @@ TOOLS_REGISTRY = {
     },
     "RFpeptides": {
         "provider_name": "RFpeptides",
-        "description": "Use RFdiffusion to design macrocyclic peptides binding target proteins.",
+        "description": "Use RFdiffusion to design macrocyclic peptide backbones that bind target proteins.",
         "category": "Peptide Design",
         "interfaces": {
             "default": {
                 "tool_name": "get_peptide_design_get_peptide_design_post",
-                "description": "Design macrocyclic peptides that bind target proteins.",
+                "description": "Design macrocyclic peptide backbones that bind target proteins.",
                 "parameters": {
                     "design_cyclic_peptide": {"type": "string", "required": True, "description": "Whether to design cyclic peptide", "enum": ["True", "False"], "default": "True"},
                     "input_pdb": {"type": "file", "required": False, "description": "Input PDB file"},
@@ -82,6 +92,157 @@ TOOLS_REGISTRY = {
                     "hotspot_res": {"type": "string", "required": False, "description": "Hotspot residues on target protein"},
                     "piptide_length": {"type": "string", "required": True, "description": "Length range of designed peptide"},
                     "num_designs": {"type": "integer", "required": True, "description": "Number of designs to generate", "default": 10}
+                },
+                "file_params": ["input_pdb"]
+            }
+        }
+    },
+    "Boltzgen Peptide-Anything": {
+        "provider_name": "Boltzgen",
+        "description": "Design peptides to bind protein targets with BoltzGen.",
+        "category": "Peptide Design",
+        "interfaces": {
+            "default": {
+                "tool_name": "design_peptide_anything_design_peptide_anything_post",
+                "description": "Design peptides to bind protein targets with optional cyclic design and structural constraints.",
+                "parameters": {
+                    "target_file": {"type": "file", "required": True, "description": "Upload PDB/CIF target file"},
+                    "target_chains": {"type": "string", "required": True, "description": "Target chains (e.g., 'A,B')"},
+                    "binding_site": {"type": "string", "required": False, "description": "Binding site (e.g., A: 13-14, 56)"},
+                    "design_length": {"type": "string", "required": True, "description": "Design length (e.g., '15' or '20-30')"},
+                    "cyclic": {"type": "boolean", "required": False, "description": "Whether the peptide should be cyclic", "default": True},
+                    "bonds_info": {"type": "string", "required": False, "description": "Covalent bonds info"},
+                    "secondary_structure": {"type": "string", "required": False, "description": "Secondary structure specification"},
+                    "inverse_fold_avoid": {"type": "string", "required": False, "description": "Disallowed residues"},
+                    "num_designs": {"type": "integer", "required": False, "description": "Number of designs to generate", "default": 5},
+                    "budget": {"type": "integer", "required": False, "description": "Final number of designs after filtering", "default": 1}
+                },
+                "file_params": ["target_file"]
+            }
+        }
+    },
+    "ProteinMPNN": {
+        "provider_name": "ProteinMPNN",
+        "description": "Design amino-acid sequences from an input peptide or protein backbone structure.",
+        "category": "Peptide Sequence Design",
+        "interfaces": {
+            "default": {
+                "tool_name": "get_proteinmpnn_info_get_proteinmpnn_info_post",
+                "description": "Use ProteinMPNN-family models to generate rational and stable sequences from a backbone structure.",
+                "parameters": {
+                    "model_type": {"type": "string", "required": False, "description": "MPNN model variant", "enum": ["ProteinMPNN", "LigandMPNN(for protein-small molecule complexes)", "AntiBMPNN", "SolubleMPNN(solubility-focused)"], "default": "ProteinMPNN"},
+                    "homo_oligomer": {"type": "string", "required": False, "description": "Enable homo-oligomer symmetry setup", "enum": ["True", "False"], "default": "False"},
+                    "use_side_chain_context": {"type": "string", "required": False, "description": "Use side-chain atoms as ligand context", "enum": ["True", "False"], "default": "False"},
+                    "pack_side_chains": {"type": "string", "required": False, "description": "Enable side-chain packing", "enum": ["True", "False"], "default": "False"},
+                    "pdb_file": {"type": "file", "required": True, "description": "Protein or peptide structure file in PDB format"},
+                    "sample_temperature": {"type": "number", "required": False, "description": "Sampling temperature"},
+                    "design_chains": {"type": "string", "required": False, "description": "Chains to redesign"},
+                    "redesigned_residues": {"type": "string", "required": False, "description": "Residues to redesign"},
+                    "bias_AA_info": {"type": "string", "required": False, "description": "Per-AA or per-residue probability bias"},
+                    "omit_AA_info": {"type": "string", "required": False, "description": "Globally or locally forbidden amino acids"},
+                    "symmetry_residues": {"type": "string", "required": False, "description": "Symmetry groups for residue coupling"},
+                    "symmetry_weights": {"type": "string", "required": False, "description": "Weights for each symmetry group"},
+                    "cutoff_for_score": {"type": "number", "required": False, "description": "Cutoff for LigandMPNN score reporting"},
+                    "number_of_packs_per_design": {"type": "integer", "required": False, "description": "Number of side-chain packing samples per design"},
+                    "design_sequence_num": {"type": "integer", "required": True, "description": "Number of sequences to generate"}
+                },
+                "file_params": ["pdb_file"]
+            }
+        }
+    },
+    "CyclicMPNN": {
+        "provider_name": "CyclicMPNN",
+        "description": "Design cyclic peptide sequences from a cyclic peptide backbone structure.",
+        "category": "Peptide Sequence Design",
+        "interfaces": {
+            "default": {
+                "tool_name": "predict_gpu_predict_gpu_post",
+                "description": "Generate energetically stable cyclic peptide sequences for a given backbone structure.",
+                "parameters": {
+                    "pdb_file": {"type": "file", "required": True, "description": "Protein backbone structure file (PDB)"},
+                    "design_chains": {"type": "string", "required": False, "description": "Chain IDs to design"},
+                    "num_seq_per_target": {"type": "integer", "required": False, "description": "Number of sequences per target", "default": 8},
+                    "sampling_temp": {"type": "number", "required": False, "description": "Sampling temperature", "default": 0.1},
+                    "omit_AAs": {"type": "string", "required": False, "description": "Amino acids to omit", "default": "X"},
+                    "fixed_positions": {"type": "string", "required": False, "description": "Residue positions to keep fixed"},
+                    "tied_positions": {"type": "string", "required": False, "description": "Residue positions to tie across chains"},
+                    "bias_AA": {"type": "string", "required": False, "description": "Global amino-acid composition bias"}
+                },
+                "file_params": ["pdb_file"]
+            }
+        }
+    },
+    "AfCycDesign Predict Structure": {
+        "provider_name": "AfCycDesign",
+        "description": "Predict peptide 3D structure from a linear or cyclic peptide sequence.",
+        "category": "Peptide Structure Validation",
+        "interfaces": {
+            "default": {
+                "tool_name": "predict_structure_predict_structure_post",
+                "description": "Predict peptide structure from sequence using AlphaFold-based cyclic or linear modeling.",
+                "parameters": {
+                    "offset_type": {"type": "string", "required": False, "description": "Cyclic offset type", "enum": ["signed", "compact"], "default": "signed"},
+                    "sequence": {"type": "string", "required": True, "description": "Peptide amino-acid sequence"},
+                    "is_cyclic": {"type": "boolean", "required": False, "description": "Whether the peptide is cyclic", "default": True},
+                    "num_recycles": {"type": "integer", "required": False, "description": "Number of recycles", "default": 3}
+                },
+                "file_params": []
+            }
+        }
+    },
+    "AfCycDesign Design Backbone": {
+        "provider_name": "AfCycDesign",
+        "description": "Design peptide sequences while preserving a standalone peptide backbone conformation.",
+        "category": "Peptide Structure Validation",
+        "interfaces": {
+            "default": {
+                "tool_name": "design_backbone_design_backbone_post",
+                "description": "Design peptide sequences from an input standalone peptide backbone structure.",
+                "parameters": {
+                    "offset_type": {"type": "string", "required": False, "description": "Cyclic offset type", "enum": ["signed", "compact"], "default": "signed"},
+                    "input_pdb": {"type": "file", "required": True, "description": "Peptide backbone structure file"},
+                    "chain": {"type": "string", "required": False, "description": "Peptide chain ID", "default": "A"},
+                    "is_cyclic": {"type": "boolean", "required": False, "description": "Whether the peptide is cyclic", "default": True},
+                    "num_designs": {"type": "integer", "required": False, "description": "Number of sequence designs to generate", "default": 10}
+                },
+                "file_params": ["input_pdb"]
+            }
+        }
+    },
+    "AfCycDesign FixBB Design": {
+        "provider_name": "AfCycDesign",
+        "description": "Design peptide sequences from a peptide-target complex structure.",
+        "category": "Peptide Structure Validation",
+        "interfaces": {
+            "default": {
+                "tool_name": "fixbb_design_fixbb_design_post",
+                "description": "Design binder-mode peptide sequences from a peptide-target complex structure.",
+                "parameters": {
+                    "input_pdb": {"type": "file", "required": True, "description": "Peptide-target complex structure file"},
+                    "chain": {"type": "string", "required": True, "description": "Peptide chain ID"},
+                    "target_chain": {"type": "string", "required": True, "description": "Target protein chain ID"},
+                    "hotspot_res": {"type": "string", "required": True, "description": "Target hotspot residues"},
+                    "num_designs": {"type": "integer", "required": False, "description": "Number of designs to generate", "default": 10},
+                    "is_cyclic": {"type": "boolean", "required": False, "description": "Whether the peptide is cyclic", "default": True}
+                },
+                "file_params": ["input_pdb"]
+            }
+        }
+    },
+    "AfCycDesign Validate": {
+        "provider_name": "AfCycDesign",
+        "description": "Validate final peptide-target structures using AlphaFold-based cyclic or linear binding validation.",
+        "category": "Peptide Structure Validation",
+        "interfaces": {
+            "default": {
+                "tool_name": "validate_cyclic_validate_cyclic_post",
+                "description": "Validate a designed peptide sequence against a peptide-target complex structure.",
+                "parameters": {
+                    "input_pdb": {"type": "file", "required": True, "description": "Peptide-target complex structure file"},
+                    "sequence": {"type": "string", "required": True, "description": "Designed peptide sequence"},
+                    "chain": {"type": "string", "required": True, "description": "Peptide chain ID"},
+                    "target_chain": {"type": "string", "required": True, "description": "Target protein chain ID"},
+                    "is_cyclic": {"type": "boolean", "required": False, "description": "Whether the peptide is cyclic", "default": True}
                 },
                 "file_params": ["input_pdb"]
             }
@@ -169,12 +330,24 @@ KEYWORD_TOOL_MAP = {
     "pocketxmol": "PocketXMol Peptide Design",
     "dock peptide": "PocketXMol Dock",
     "peptide docking": "PocketXMol Dock",
+    "cyclic peptide docking": "PocketXMol Dock",
     "sbdd": "PocketXMol SBDD",
+    "fragment linking": "PocketXMol SBDD",
+    "fragment growing": "PocketXMol SBDD",
     "peptide design": "PocketXMol Peptide Design",
+    "boltzgen peptide": "Boltzgen Peptide-Anything",
+    "cyclic peptide design": "PocketXMol Peptide Design",
     "inverse folding": "PocketXMol Peptide Design",
     "side-chain packing": "PocketXMol Peptide Design",
     "rfpeptides": "RFpeptides",
     "macrocyclic peptide": "RFpeptides",
+    "proteinmpnn": "ProteinMPNN",
+    "cyclicmpnn": "CyclicMPNN",
+    "sequence design": "ProteinMPNN",
+    "cyclic sequence design": "CyclicMPNN",
+    "afcycdesign": "AfCycDesign Validate",
+    "peptide validation": "AfCycDesign Validate",
+    "structure validation": "AfCycDesign Validate",
     "descriptors": "Peptide Molecular Descriptors",
     "extinction coefficient": "Peptide Extinction Coefficient",
     "pichemist": "Peptide pIChemiSt String",
