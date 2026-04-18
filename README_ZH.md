@@ -14,6 +14,9 @@ SciMiner 技能集
 - `peptide-design`：肽设计与分析（口袋引导对接、宏环肽设计、肽描述符、消光系数、等电点、毒性/不利特性检测）。需要 `SCIMINER_API_KEY`。ClawHub: https://clawhub.ai/xiongzhp/peptide-design
 - `protein-design`：BoltzGen 蛋白/肽/抗体/纳米抗体设计（支持从目标或框架文件进行设计）。需要 `SCIMINER_API_KEY`。ClawHub: https://clawhub.ai/xiongzhp/protein-design
 - `structure-prediction`：生物分子结构预测（Chai-1、Boltz-2、Alphafold3），支持蛋白、核酸、配体及复合体。需要 `SCIMINER_API_KEY`。ClawHub: https://clawhub.ai/xiongzhp/structure-prediction
+- `virtual-screening`：虚拟筛选工作流（小分子与片段库的对接、评分、库生成与高通量筛选）。需要 `SCIMINER_API_KEY`。ClawHub: https://clawhub.ai/sciminer/virtual-screening
+- `small-molecule-design`：小分子生成与优化工作流（从头设计、先导优化、性质约束生成）。需要 `SCIMINER_API_KEY`。ClawHub: https://clawhub.ai/sciminer/small-molecule-design
+- `synthesis-evaluation`：合成规划与评估（逆合成建议、路线评分、可行性与构建块分析）。需要 `SCIMINER_API_KEY`。ClawHub: https://clawhub.ai/sciminer/synthesis-evaluation
 
 备注
 - 这些技能依赖 SciMiner API，可能需要 API 凭证。
