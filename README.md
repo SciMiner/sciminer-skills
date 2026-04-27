@@ -18,6 +18,8 @@ Skills
 - `small-molecule-design`: Small-molecule generative and optimization workflows (de novo design, lead optimization, property-constrained generation). Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/sciminer/small-molecule-design
 - `synthesis-evaluation`: Synthesis planning and evaluation tools (retrosynthesis suggestions, route scoring, feasibility and building-block analysis). Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/sciminer/synthesis-evaluation
 - `optical-chemical-structure-recognition`: Optical chemical structure recognition (image-to-structure OCR, extract structures from figures or PDFs, image-to-SMILES conversion and parsing). Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/sciminer/optical-chemical-structure-recognition
+- `binding-site-prediction`: Binding-site and pocket prediction workflows using P2Rank, AF2BIND, and fpocket (ML-based ranking, geometry-based detection, and per-residue binding probability scoring). Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/sciminer/binding-site-prediction
+- `antibody-engineering`: End-to-end antibody engineering combining ANARCI, BioPhi, IgFold, FoldX, and Rosetta (sequence numbering, humanization, structure prediction, developability profiling, affinity maturation, and precision redesign). Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/sciminer/antibody-engineering
 
 Notes
 - These skills rely on the SciMiner API and require an API key, which you can obtain for free at https://sciminer.tech/utility and paste into the input box of OpenClaw or Claude code when prompted.
