@@ -105,7 +105,7 @@
       width: min(850px, 100%);
       min-height: min(1120px, calc(100vh - 112px));
       margin: 0 auto;
-      padding: clamp(30px, 5vw, 58px);
+      padding: clamp(28px, 4.2vw, 44px);
       border: 1px solid rgba(255, 255, 255, 0.72);
       border-radius: 8px;
       background:
@@ -141,7 +141,7 @@
       gap: 9px;
       margin-bottom: 18px;
       color: var(--teal);
-      font-size: 13px;
+      font-size: 18px;
       font-weight: 800;
       letter-spacing: 0;
       text-transform: uppercase;
@@ -165,7 +165,7 @@
     h1 {
       max-width: 970px;
       margin-bottom: 24px;
-      font-size: clamp(54px, 9vw, 86px);
+      font-size: clamp(62px, 9.6vw, 94px);
       line-height: 1;
       letter-spacing: 0;
     }
@@ -173,14 +173,14 @@
     h2 {
       max-width: 920px;
       margin-bottom: 18px;
-      font-size: clamp(34px, 6vw, 58px);
+      font-size: clamp(44px, 6.6vw, 66px);
       line-height: 1.08;
       letter-spacing: 0;
     }
 
     h3 {
       margin-bottom: 10px;
-      font-size: 21px;
+      font-size: 29px;
       line-height: 1.24;
       letter-spacing: 0;
     }
@@ -188,14 +188,14 @@
     .lead {
       max-width: 760px;
       color: #38445a;
-      font-size: clamp(18px, 2.6vw, 23px);
-      line-height: 1.62;
+      font-size: clamp(25px, 3.1vw, 31px);
+      line-height: 1.42;
     }
 
     .hero-layout {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 34px;
+      gap: 28px;
       align-items: center;
     }
 
@@ -210,7 +210,7 @@
       border-radius: 8px;
       background: #132238;
       color: #fffdf8;
-      font-size: 13px;
+      font-size: 18px;
       font-weight: 800;
       text-decoration: none;
     }
@@ -218,14 +218,14 @@
     .repo-link::before {
       content: "GitHub";
       color: rgba(255, 253, 248, 0.72);
-      font-size: 11px;
+      font-size: 14px;
       letter-spacing: 0;
       text-transform: uppercase;
     }
 
     .molecule-map {
       position: relative;
-      min-height: 390px;
+      min-height: 340px;
       border: 1px solid rgba(20, 33, 61, 0.13);
       border-radius: 8px;
       background:
@@ -254,7 +254,7 @@
       position: absolute;
       width: 132px;
       min-height: 86px;
-      padding: 13px;
+      padding: 12px;
       border: 1px solid rgba(20, 33, 61, 0.16);
       border-radius: 7px;
       background: rgba(255, 253, 248, 0.92);
@@ -264,13 +264,13 @@
     .node strong {
       display: block;
       margin-bottom: 5px;
-      font-size: 15px;
+      font-size: 19px;
     }
 
     .node span {
       color: var(--muted);
-      font-size: 12px;
-      line-height: 1.35;
+      font-size: 16px;
+      line-height: 1.32;
     }
 
     .n1 { top: 8%; left: 8%; border-top: 5px solid var(--teal); }
@@ -282,12 +282,12 @@
     .stats {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      margin-top: 34px;
+      gap: 12px;
+      margin-top: 24px;
     }
 
     .stat {
-      padding: 18px;
+      padding: 16px;
       border: 1px solid var(--line);
       border-radius: 7px;
       background: rgba(255, 255, 255, 0.62);
@@ -297,19 +297,19 @@
     .stat b {
       display: block;
       margin-bottom: 4px;
-      font-size: 36px;
+      font-size: 50px;
       line-height: 1;
     }
 
     .stat span {
       color: var(--muted);
-      font-size: 14px;
-      line-height: 1.45;
+      font-size: 19px;
+      line-height: 1.32;
     }
 
     .grid {
       display: grid;
-      gap: 18px;
+      gap: 14px;
     }
 
     .grid.two {
@@ -326,8 +326,8 @@
 
     .card {
       position: relative;
-      min-height: 178px;
-      padding: 22px;
+      min-height: 184px;
+      padding: 21px;
       border: 1px solid var(--line);
       border-radius: 7px;
       background: rgba(255, 255, 255, 0.66);
@@ -348,13 +348,13 @@
     .tag {
       display: inline-flex;
       align-items: center;
-      min-height: 26px;
-      margin-bottom: 16px;
+      min-height: 30px;
+      margin-bottom: 12px;
       padding: 0 10px;
       border: 1px solid color-mix(in srgb, var(--accent, var(--teal)) 46%, transparent);
       border-radius: 7px;
       color: var(--accent, var(--teal));
-      font-size: 12px;
+      font-size: 17px;
       font-weight: 800;
     }
 
@@ -362,15 +362,15 @@
     .flow-step p,
     .tool-row p {
       color: var(--muted);
-      font-size: 15px;
-      line-height: 1.62;
+      font-size: 22px;
+      line-height: 1.38;
     }
 
     .chips {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 18px;
+      margin-top: 14px;
     }
 
     .chip {
@@ -378,7 +378,7 @@
       border-radius: 7px;
       background: rgba(20, 33, 61, 0.06);
       color: #38445a;
-      font-size: 12px;
+      font-size: 17px;
       font-weight: 700;
     }
 
@@ -387,25 +387,25 @@
       align-items: start;
       justify-content: space-between;
       gap: 18px;
-      margin-bottom: 28px;
+      margin-bottom: 22px;
     }
 
     .skill-title p {
       max-width: 520px;
       color: var(--muted);
-      font-size: 17px;
-      line-height: 1.6;
+      font-size: 24px;
+      line-height: 1.38;
     }
 
     .matrix {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 30px;
+      gap: 10px;
+      margin-top: 24px;
     }
 
     .matrix-item {
-      min-height: 118px;
+      min-height: 132px;
       padding: 16px;
       border: 1px solid var(--line);
       border-radius: 7px;
@@ -416,20 +416,20 @@
       display: block;
       margin-bottom: 8px;
       color: var(--accent, var(--teal));
-      font-size: 14px;
+      font-size: 20px;
     }
 
     .matrix-item span {
       color: var(--muted);
-      font-size: 13px;
-      line-height: 1.42;
+      font-size: 19px;
+      line-height: 1.34;
     }
 
     .flow {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-      margin-top: 34px;
+      gap: 12px;
+      margin-top: 24px;
     }
 
     .flow-step:nth-child(5) {
@@ -438,8 +438,8 @@
 
     .flow-step {
       position: relative;
-      min-height: 168px;
-      padding: 22px;
+      min-height: 174px;
+      padding: 21px;
       border: 1px solid var(--line);
       border-radius: 7px;
       background: rgba(255, 255, 255, 0.66);
@@ -451,17 +451,17 @@
       height: 34px;
       align-items: center;
       justify-content: center;
-      margin-bottom: 18px;
+      margin-bottom: 12px;
       border-radius: 50%;
       background: var(--ink);
       color: #fffdf8;
-      font-size: 14px;
+      font-size: 18px;
     }
 
     .tool-list {
       display: grid;
-      gap: 12px;
-      margin-top: 28px;
+      gap: 10px;
+      margin-top: 20px;
     }
 
     .tool-row {
@@ -469,7 +469,7 @@
       grid-template-columns: 220px minmax(0, 1fr) 190px;
       gap: 18px;
       align-items: center;
-      padding: 16px 18px;
+      padding: 15px 16px;
       border: 1px solid var(--line);
       border-radius: 7px;
       background: rgba(255, 255, 255, 0.66);
@@ -477,7 +477,7 @@
 
     .tool-row strong {
       color: var(--accent, var(--teal));
-      font-size: 16px;
+      font-size: 22px;
     }
 
     .tool-row code,
@@ -487,13 +487,13 @@
 
     .tool-row code {
       color: #38445a;
-      font-size: 12px;
+      font-size: 16px;
       word-break: break-word;
     }
 
     .codebox {
-      margin-top: 28px;
-      padding: 22px;
+      margin-top: 20px;
+      padding: 20px;
       border: 1px solid rgba(20, 33, 61, 0.18);
       border-radius: 7px;
       background: #14213d;
@@ -504,21 +504,21 @@
 
     .codebox pre {
       margin: 0;
-      font-size: 14px;
-      line-height: 1.72;
+      font-size: 19px;
+      line-height: 1.45;
     }
 
     .footer-band {
       display: grid;
       grid-template-columns: 1fr auto;
-      gap: 24px;
+      gap: 18px;
       align-items: end;
-      margin-top: 44px;
-      padding-top: 24px;
+      margin-top: 32px;
+      padding-top: 18px;
       border-top: 1px solid var(--line);
       color: var(--muted);
-      font-size: 14px;
-      line-height: 1.55;
+      font-size: 19px;
+      line-height: 1.34;
     }
 
     .footer-band a {
@@ -529,8 +529,8 @@
     }
 
     .qr-box {
-      width: 132px;
-      height: 132px;
+      width: 150px;
+      height: 150px;
       display: grid;
       place-items: center;
       border: 1px solid var(--line);
