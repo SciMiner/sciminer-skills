@@ -1,0 +1,928 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SciMiner Skills 中文海报</title>
+  <style>
+    :root {
+      --ink: #132238;
+      --muted: #647084;
+      --line: rgba(19, 34, 56, 0.13);
+      --paper: #f4f1eb;
+      --panel: #fffdf8;
+      --teal: #08746f;
+      --cyan: #0c7894;
+      --green: #5f7f1f;
+      --amber: #b06012;
+      --rose: #b9234a;
+      --violet: #6d45c8;
+      --blue: #2459b8;
+      --plum: #4d365f;
+      --shadow: 0 24px 70px rgba(19, 34, 56, 0.16);
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(115deg, rgba(8, 116, 111, 0.12), transparent 34%),
+        linear-gradient(245deg, rgba(176, 96, 18, 0.13), transparent 32%),
+        repeating-linear-gradient(90deg, rgba(19, 34, 56, 0.035) 0 1px, transparent 1px 44px),
+        var(--paper);
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .poster-shell {
+      position: relative;
+      padding: 16px 0 58px;
+    }
+
+    .topbar {
+      position: fixed;
+      z-index: 20;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: min(900px, calc(100vw - 28px));
+      padding: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.64);
+      border-radius: 8px;
+      background: rgba(255, 253, 248, 0.9);
+      box-shadow: 0 10px 34px rgba(20, 33, 61, 0.12);
+      backdrop-filter: blur(16px);
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .topbar a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 7px;
+      color: var(--muted);
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    .topbar a:hover,
+    .topbar a:focus-visible {
+      background: #14213d;
+      color: #fffdf8;
+      outline: none;
+    }
+
+    .page {
+      min-height: 100vh;
+      padding: 82px 22px 30px;
+      display: grid;
+      align-items: center;
+      scroll-snap-align: start;
+      page-break-after: always;
+    }
+
+    .page-inner {
+      position: relative;
+      width: min(850px, 100%);
+      min-height: min(1120px, calc(100vh - 112px));
+      margin: 0 auto;
+      padding: clamp(30px, 5vw, 58px);
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255, 253, 248, 0.96), rgba(250, 247, 239, 0.96)),
+        var(--panel);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .page-inner::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 12px;
+      background: linear-gradient(90deg, var(--teal), var(--amber) 34%, var(--rose) 66%, var(--blue));
+    }
+
+    .page-inner::after {
+      content: "SciMiner Skills";
+      position: absolute;
+      right: 28px;
+      bottom: 22px;
+      color: rgba(19, 34, 56, 0.22);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 18px;
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 30px;
+      height: 2px;
+      border-radius: 99px;
+      background: currentColor;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 970px;
+      margin-bottom: 24px;
+      font-size: clamp(54px, 9vw, 86px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      max-width: 920px;
+      margin-bottom: 18px;
+      font-size: clamp(34px, 6vw, 58px);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      font-size: 21px;
+      line-height: 1.24;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 760px;
+      color: #38445a;
+      font-size: clamp(18px, 2.6vw, 23px);
+      line-height: 1.62;
+    }
+
+    .hero-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 34px;
+      align-items: center;
+    }
+
+    .repo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      margin-top: 18px;
+      padding: 0 13px;
+      border: 1px solid rgba(19, 34, 56, 0.18);
+      border-radius: 8px;
+      background: #132238;
+      color: #fffdf8;
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .repo-link::before {
+      content: "GitHub";
+      color: rgba(255, 253, 248, 0.72);
+      font-size: 11px;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .molecule-map {
+      position: relative;
+      min-height: 390px;
+      border: 1px solid rgba(20, 33, 61, 0.13);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(255, 253, 248, 0.94), rgba(232, 245, 242, 0.94)),
+        linear-gradient(45deg, transparent 0 47%, rgba(19, 34, 56, 0.05) 47% 53%, transparent 53%),
+        repeating-linear-gradient(90deg, transparent 0 38px, rgba(20, 33, 61, 0.04) 39px 40px);
+      box-shadow: 0 18px 45px rgba(20, 33, 61, 0.10);
+      overflow: hidden;
+    }
+
+    .molecule-map::before,
+    .molecule-map::after {
+      content: "";
+      position: absolute;
+      inset: 12%;
+      border: 1px dashed rgba(20, 33, 61, 0.18);
+      transform: rotate(-18deg);
+    }
+
+    .molecule-map::after {
+      inset: 24% 8%;
+      transform: rotate(21deg);
+    }
+
+    .node {
+      position: absolute;
+      width: 132px;
+      min-height: 86px;
+      padding: 13px;
+      border: 1px solid rgba(20, 33, 61, 0.16);
+      border-radius: 7px;
+      background: rgba(255, 253, 248, 0.92);
+      box-shadow: 0 12px 30px rgba(20, 33, 61, 0.10);
+    }
+
+    .node strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 15px;
+    }
+
+    .node span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .n1 { top: 8%; left: 8%; border-top: 5px solid var(--teal); }
+    .n2 { top: 13%; right: 8%; border-top: 5px solid var(--blue); }
+    .n3 { top: 40%; left: 39%; border-top: 5px solid var(--amber); }
+    .n4 { bottom: 9%; left: 10%; border-top: 5px solid var(--rose); }
+    .n5 { bottom: 10%; right: 9%; border-top: 5px solid var(--green); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 34px;
+    }
+
+    .stat {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.62);
+      box-shadow: 0 10px 24px rgba(19, 34, 56, 0.06);
+    }
+
+    .stat b {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 36px;
+      line-height: 1;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid.four {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card {
+      position: relative;
+      min-height: 178px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.66);
+      box-shadow: 0 12px 30px rgba(20, 33, 61, 0.07);
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: var(--accent, var(--teal));
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      margin-bottom: 16px;
+      padding: 0 10px;
+      border: 1px solid color-mix(in srgb, var(--accent, var(--teal)) 46%, transparent);
+      border-radius: 7px;
+      color: var(--accent, var(--teal));
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .card p,
+    .flow-step p,
+    .tool-row p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.62;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .chip {
+      padding: 6px 9px;
+      border-radius: 7px;
+      background: rgba(20, 33, 61, 0.06);
+      color: #38445a;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .skill-title {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .skill-title p {
+      max-width: 520px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.6;
+    }
+
+    .matrix {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .matrix-item {
+      min-height: 118px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    .matrix-item b {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--accent, var(--teal));
+      font-size: 14px;
+    }
+
+    .matrix-item span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.42;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 34px;
+    }
+
+    .flow-step:nth-child(5) {
+      grid-column: 1 / -1;
+    }
+
+    .flow-step {
+      position: relative;
+      min-height: 168px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.66);
+    }
+
+    .flow-step b {
+      display: inline-flex;
+      width: 34px;
+      height: 34px;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: #fffdf8;
+      font-size: 14px;
+    }
+
+    .tool-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .tool-row {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr) 190px;
+      gap: 18px;
+      align-items: center;
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.66);
+    }
+
+    .tool-row strong {
+      color: var(--accent, var(--teal));
+      font-size: 16px;
+    }
+
+    .tool-row code,
+    .codebox code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    .tool-row code {
+      color: #38445a;
+      font-size: 12px;
+      word-break: break-word;
+    }
+
+    .codebox {
+      margin-top: 28px;
+      padding: 22px;
+      border: 1px solid rgba(20, 33, 61, 0.18);
+      border-radius: 7px;
+      background: #14213d;
+      color: #fffdf8;
+      box-shadow: var(--shadow);
+      overflow-x: auto;
+    }
+
+    .codebox pre {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.72;
+    }
+
+    .footer-band {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: end;
+      margin-top: 44px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .footer-band a {
+      color: var(--blue);
+      font-weight: 800;
+      text-decoration: none;
+      overflow-wrap: anywhere;
+    }
+
+    .qr-box {
+      width: 132px;
+      height: 132px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fffdf8;
+      padding: 8px;
+    }
+
+    .qr-box img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .print-note {
+      position: fixed;
+      z-index: 21;
+      right: 16px;
+      bottom: 16px;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: rgba(255, 253, 248, 0.88);
+      color: var(--muted);
+      font-size: 12px;
+      box-shadow: 0 10px 32px rgba(20, 33, 61, 0.12);
+      backdrop-filter: blur(12px);
+    }
+
+    @media (max-width: 980px) {
+      .hero-layout,
+      .grid.two,
+      .grid.three,
+      .grid.four,
+      .matrix,
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .page {
+        padding: 92px 22px 54px;
+      }
+
+      .page-inner {
+        min-height: auto;
+      }
+
+      .molecule-map {
+        min-height: 430px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .skill-title {
+        display: block;
+      }
+
+      .tool-row {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-band {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .topbar {
+        left: 10px;
+        right: 10px;
+        transform: none;
+        border-radius: 8px;
+      }
+
+      h1 {
+        font-size: 48px;
+      }
+
+      h2 {
+        font-size: 34px;
+      }
+
+      .node {
+        width: 118px;
+      }
+
+      .n2 { right: 4%; }
+      .n3 { left: 29%; }
+      .n5 { right: 5%; }
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+
+      body {
+        background: var(--paper);
+      }
+
+      .topbar,
+      .print-note {
+        display: none;
+      }
+
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        padding: 0;
+        margin: 0 auto;
+        break-after: page;
+      }
+
+      .page-inner {
+        width: 100%;
+        min-height: 297mm;
+        padding: 16mm 15mm;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .card,
+      .flow-step,
+      .tool-row,
+      .molecule-map,
+      .codebox {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="topbar" aria-label="海报分页导航">
+    <a href="#cover">封面</a>
+    <a href="#map">能力地图</a>
+    <a href="#molecule">小分子</a>
+    <a href="#biomolecule">生物分子</a>
+    <a href="#structure">结构与口袋</a>
+    <a href="#antibody">抗体工程</a>
+    <a href="#workflow">闭环流程</a>
+    <a href="#install">安装调用</a>
+    <a href="https://github.com/SciMiner/sciminer-skills" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+
+  <main class="poster-shell">
+    <section class="page" id="cover">
+      <div class="page-inner hero-layout">
+        <div>
+          <div class="eyebrow">SciMiner Skills</div>
+          <h1>把药物发现工作流装进 AI Agent</h1>
+          <p class="lead">本仓库收录 10 个基于 SciMiner API 的技能，覆盖结构预测、口袋发现、小分子与肽设计、虚拟筛选、合成评估、ADMET/PKPD、抗体工程和化学结构识别。</p>
+          <div class="stats" aria-label="核心统计">
+            <div class="stat"><b>10</b><span>个可安装 skill，面向药物发现关键任务</span></div>
+            <div class="stat"><b>40+</b><span>个 SciMiner 内部工具与模型入口</span></div>
+            <div class="stat"><b>1</b><span>个统一凭证：SCIMINER_API_KEY</span></div>
+          </div>
+          <a class="repo-link" href="https://github.com/SciMiner/sciminer-skills" target="_blank" rel="noopener">github.com/SciMiner/sciminer-skills</a>
+        </div>
+
+        <div class="molecule-map" aria-label="SciMiner 能力视觉图">
+          <div class="node n1"><strong>Design</strong><span>分子、蛋白、肽与抗体候选生成</span></div>
+          <div class="node n2"><strong>Predict</strong><span>结构、口袋、性质与代谢风险预测</span></div>
+          <div class="node n3"><strong>Screen</strong><span>商业库筛选、对接评分与聚类</span></div>
+          <div class="node n4"><strong>Validate</strong><span>Gnina、FoldX、Rosetta 与可开发性分析</span></div>
+          <div class="node n5"><strong>Share</strong><span>每个结果可生成在线 share_url</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="map">
+      <div class="page-inner">
+        <div class="eyebrow">Capability Map</div>
+        <h2>从图像、序列、结构到候选分子的一张能力地图</h2>
+        <p class="lead">这些 skill 不是孤立工具，而是可组合的研究链路：先识别和建模，再设计和筛选，随后用性质、合成与可开发性指标做决策。</p>
+        <div class="matrix">
+          <div class="matrix-item" style="--accent: var(--cyan)"><b>结构输入</b><span>Chai-1、Boltz-2、Alphafold3 预测蛋白、核酸、配体和复合物。</span></div>
+          <div class="matrix-item" style="--accent: var(--green)"><b>口袋定位</b><span>P2Rank、fpocket、AF2BIND 发现和交叉验证结合位点。</span></div>
+          <div class="matrix-item" style="--accent: var(--teal)"><b>分子生成</b><span>REINVENT4、PocketXMol、BoltzGen 支持多场景候选设计。</span></div>
+          <div class="matrix-item" style="--accent: var(--amber)"><b>筛选排序</b><span>TransformerCPI、Docking、Gnina Score 组合产生优先级。</span></div>
+          <div class="matrix-item" style="--accent: var(--rose)"><b>成药判断</b><span>ADMET、SAScore、逆合成、BioPhi 和 SAP 风险检查。</span></div>
+        </div>
+        <div class="grid four" style="margin-top: 28px;">
+          <article class="card" style="--accent: var(--cyan)"><span class="tag">输入解析</span><h3>化学图像转结构</h3><p>OCSR 从论文图、截图或幻灯片中提取分子结构与名称，转成后续设计和性质预测可用的分子输入。</p></article>
+          <article class="card" style="--accent: var(--green)"><span class="tag">结构理解</span><h3>复合物与口袋</h3><p>结构预测与结合位点预测协同，帮助从序列、PDB 或上传结构推断可操作的 docking box 与候选位点。</p></article>
+          <article class="card" style="--accent: var(--teal)"><span class="tag">候选生成</span><h3>多模态设计</h3><p>小分子、肽、蛋白、抗体和纳米抗体设计工具覆盖从头生成、片段连接、骨架设计和序列设计。</p></article>
+          <article class="card" style="--accent: var(--rose)"><span class="tag">风险过滤</span><h3>性质与可合成性</h3><p>ADMET/PKPD、pKa、溶剂化能、口服生物利用度、SAScore 与逆合成路线支持候选收敛。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="molecule">
+      <div class="page-inner">
+        <div class="skill-title">
+          <div>
+            <div class="eyebrow">Small Molecule Track</div>
+            <h2>小分子：设计、筛选、合成与 ADMET 决策</h2>
+          </div>
+          <p>适合先导发现、先导优化、商业库筛选、文献分子提取以及候选分子的早期成药性评估。</p>
+        </div>
+        <div class="grid four">
+          <article class="card" style="--accent: var(--teal)">
+            <span class="tag">small-molecule-design</span>
+            <h3>小分子生成与优化</h3>
+            <p>REINVENT4 负责无结构生成、迁移学习和强化学习优化；PocketXMol 负责基于蛋白口袋的从头设计、片段连接和片段生长。</p>
+            <div class="chips"><span class="chip">REINVENT4</span><span class="chip">PocketXMol</span><span class="chip">Gnina Score</span></div>
+          </article>
+          <article class="card" style="--accent: var(--amber)">
+            <span class="tag">virtual-screening</span>
+            <h3>虚拟筛选</h3>
+            <p>有结构时走 docking-based proprietary library screen；无结构时用 Transformer-based screen，并可先从 UniProt 获取蛋白序列。</p>
+            <div class="chips"><span class="chip">Get Box</span><span class="chip">TransformerCPI</span><span class="chip">Docking</span></div>
+          </article>
+          <article class="card" style="--accent: var(--rose)">
+            <span class="tag">admet-pkpd</span>
+            <h3>ADMET/PKPD 与性质预测</h3>
+            <p>覆盖 pan-ADMET、溶剂化能、pKa、口服生物利用度、共晶潜力、AOX 代谢位点和分子描述符。</p>
+            <div class="chips"><span class="chip">ADMET</span><span class="chip">pKa</span><span class="chip">OBA</span><span class="chip">AOMP</span></div>
+          </article>
+          <article class="card" style="--accent: var(--green)">
+            <span class="tag">synthesis-evaluation</span>
+            <h3>合成规划与可合成性</h3>
+            <p>SynFormer-ED 生成可合成类似物，SAScore 快速判断合成难度，Retrosynthesis Planner 给出候选逆合成路线。</p>
+            <div class="chips"><span class="chip">SynFormer-ED</span><span class="chip">SAScore</span><span class="chip">Retrosynthesis</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="biomolecule">
+      <div class="page-inner">
+        <div class="skill-title">
+          <div>
+            <div class="eyebrow">Biomolecule Design</div>
+            <h2>肽、蛋白与纳米抗体：从骨架到序列再到验证</h2>
+          </div>
+          <p>面向蛋白靶点结合剂设计，既能做口袋引导的候选生成，也能把骨架设计、序列设计和结构验证串起来。</p>
+        </div>
+        <div class="grid three">
+          <article class="card" style="--accent: var(--cyan)">
+            <span class="tag">peptide-design</span>
+            <h3>肽与宏环肽设计</h3>
+            <p>PocketXMol、BoltzGen、RFpeptides、ProteinMPNN、CyclicMPNN 与 AfCycDesign 支持线性肽、环肽和宏环肽的设计、对接和验证。</p>
+            <div class="chips"><span class="chip">Pocket-guided</span><span class="chip">Macrocycle</span><span class="chip">pI / Extinction</span></div>
+          </article>
+          <article class="card" style="--accent: var(--teal)">
+            <span class="tag">protein-design</span>
+            <h3>蛋白/肽/抗体/纳米抗体设计</h3>
+            <p>BoltzGen 支持针对抗原或小分子的从头设计与定向设计，文件上传后可指定目标链、框架和 CDR 区域约束。</p>
+            <div class="chips"><span class="chip">BoltzGen</span><span class="chip">De Novo</span><span class="chip">Targeted Design</span></div>
+          </article>
+          <article class="card" style="--accent: var(--blue)">
+            <span class="tag">structure-prediction</span>
+            <h3>多组分结构预测</h3>
+            <p>Chai-1、Boltz-2 和 Alphafold3 可预测蛋白、DNA、RNA、配体与混合复合物，为设计与筛选提供结构上下文。</p>
+            <div class="chips"><span class="chip">Chai-1</span><span class="chip">Boltz-2</span><span class="chip">Alphafold3</span></div>
+          </article>
+        </div>
+        <div class="flow">
+          <div class="flow-step"><b>1</b><h3>目标结构</h3><p>上传 PDB/CIF，或用结构预测工具从序列和配体输入建立复合物模型。</p></div>
+          <div class="flow-step"><b>2</b><h3>结合区域</h3><p>用口袋描述、残基约束或 docking box 限定候选生成空间。</p></div>
+          <div class="flow-step"><b>3</b><h3>候选生成</h3><p>生成肽骨架、蛋白序列、抗体 CDR 变体或纳米抗体方案。</p></div>
+          <div class="flow-step"><b>4</b><h3>结构验证</h3><p>通过 AfCycDesign、IgFold、FoldX 或 Rosetta 检查构象与能量。</p></div>
+          <div class="flow-step"><b>5</b><h3>候选收敛</h3><p>综合亲和力、稳定性、免疫原性与可开发性风险输出 Top panel。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="structure">
+      <div class="page-inner">
+        <div class="skill-title">
+          <div>
+            <div class="eyebrow">Structure Intelligence</div>
+            <h2>结构预测与结合位点预测，给设计任务确定坐标系</h2>
+          </div>
+          <p>结构类 skill 的价值在于把自然语言、序列、PDB ID 或上传结构转成可执行的模型、口袋、残基概率和 docking box。</p>
+        </div>
+        <div class="grid two">
+          <article class="card" style="--accent: var(--blue)">
+            <span class="tag">structure-prediction</span>
+            <h3>Chai-1 / Boltz-2 / Alphafold3</h3>
+            <p>支持蛋白、核酸、配体与复合物预测；可在需要时带上 MSA、template 或 restraint 输入，用于后续 docking、筛选和结构设计。</p>
+            <div class="chips"><span class="chip">Protein-ligand</span><span class="chip">Protein-protein</span><span class="chip">Protein-DNA/RNA</span></div>
+          </article>
+          <article class="card" style="--accent: var(--green)">
+            <span class="tag">binding-site-prediction</span>
+            <h3>P2Rank / AF2BIND / fpocket</h3>
+            <p>P2Rank 做机器学习口袋排名，fpocket 做几何检测，AF2BIND 给出残基级结合概率。多方法一致时更适合作为 docking box 和设计区域。</p>
+            <div class="chips"><span class="chip">Pocket Ranking</span><span class="chip">Residue Probability</span><span class="chip">Consensus Site</span></div>
+          </article>
+        </div>
+        <div class="tool-list">
+          <div class="tool-row" style="--accent: var(--green)"><strong>快速口袋发现</strong><p>上传 receptor 后用 P2Rank 或 fpocket 识别可药靶口袋，并输出几何和排名信息。</p><code>run_p2rank / run_fpocket</code></div>
+          <div class="tool-row" style="--accent: var(--blue)"><strong>残基级交叉验证</strong><p>结构文件、PDB code 或 UniProt 风格标识可进入 AF2BIND，查看高概率结合残基是否聚集在同一区域。</p><code>predict_gpu_predict_gpu_post</code></div>
+          <div class="tool-row" style="--accent: var(--amber)"><strong>设计前交接</strong><p>把共识位点交给 Get Box、PocketXMol、虚拟筛选或肽/小分子设计流程，减少无效搜索空间。</p><code>calculate_box_calculate_post</code></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="antibody">
+      <div class="page-inner">
+        <div class="skill-title">
+          <div>
+            <div class="eyebrow">Antibody Engineering</div>
+            <h2>抗体工程：编号、人源化、建模、突变扫描与精准重设计</h2>
+          </div>
+          <p>antibody-engineering skill 把 ANARCI、BioPhi、IgFold、FoldX 和 Rosetta 串成端到端候选优化闭环。</p>
+        </div>
+        <div class="flow">
+          <div class="flow-step"><b>1</b><h3>序列编号</h3><p>ANARCI 用 IMGT、Kabat 等体系解析 VH/VL 区域与 CDR 边界。</p></div>
+          <div class="flow-step"><b>2</b><h3>人源化</h3><p>BioPhi 评估 humanness 与 OASis 风险，生成 Sapiens 或 CDR grafting 变体。</p></div>
+          <div class="flow-step"><b>3</b><h3>结构建模</h3><p>IgFold 预测亲本与候选结构，Rosetta FastRelax 进行局部放松。</p></div>
+          <div class="flow-step"><b>4</b><h3>能量扫描</h3><p>FoldX 对稳定性、AlaScan、PositionScan 和 AnalyseComplex 做高通量初筛。</p></div>
+          <div class="flow-step"><b>5</b><h3>精准设计</h3><p>Rosetta FastDesign 与 InterfaceAnalyzer 复核界面质量，SAP Score 控制聚集风险。</p></div>
+        </div>
+        <div class="grid three" style="margin-top: 24px;">
+          <article class="card" style="--accent: var(--rose)"><span class="tag">De-risking</span><h3>先降风险再优化</h3><p>先明确 CDR/FR 边界和免疫原性风险，再决定哪些位置允许突变。</p></article>
+          <article class="card" style="--accent: var(--violet)"><span class="tag">Energy</span><h3>亲和力与稳定性并行</h3><p>候选筛选同时关注结合能和折叠稳定性，避免单目标优化带来的开发风险。</p></article>
+          <article class="card" style="--accent: var(--green)"><span class="tag">Panel</span><h3>输出 Top 10-20 候选</h3><p>最终候选综合 FoldX、Rosetta、SAP、IgFold 和 BioPhi 指标，形成可推进 panel。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="workflow">
+      <div class="page-inner">
+        <div class="eyebrow">Composable Workflow</div>
+        <h2>推荐组合：从资料输入到候选决策的一条可复用路径</h2>
+        <p class="lead">每个 skill 都通过 SciMiner 内部 API 调用，返回统一任务状态和 share_url。把结果链接沉淀下来，就能形成可追踪、可复审的研究记录。</p>
+        <div class="flow">
+          <div class="flow-step"><b>1</b><h3>提取输入</h3><p>从图片提取 SMILES，或从 UniProt、序列、PDB、上传文件建立起始材料。</p></div>
+          <div class="flow-step"><b>2</b><h3>建立结构</h3><p>结构预测补齐未知复合物，结合位点预测给出口袋与残基概率。</p></div>
+          <div class="flow-step"><b>3</b><h3>生成候选</h3><p>按任务选择小分子、肽、蛋白、抗体或纳米抗体设计工具。</p></div>
+          <div class="flow-step"><b>4</b><h3>筛选评分</h3><p>虚拟筛选、Gnina、FoldX、Rosetta、AfCycDesign 等工具帮助候选排序。</p></div>
+          <div class="flow-step"><b>5</b><h3>成药收敛</h3><p>ADMET/PKPD、SAScore、逆合成和可开发性指标决定下一轮实验优先级。</p></div>
+        </div>
+        <div class="grid two" style="margin-top: 28px;">
+          <article class="card" style="--accent: var(--cyan)"><span class="tag">结构驱动路线</span><h3>PDB/结构文件已知</h3><p>binding-site-prediction → Get Box → small-molecule-design 或 virtual-screening → admet-pkpd → synthesis-evaluation。</p></article>
+          <article class="card" style="--accent: var(--amber)"><span class="tag">序列驱动路线</span><h3>只有靶点名称或序列</h3><p>Get Protein Sequence / structure-prediction → binding-site-prediction → protein-design / peptide-design → 结构与性质验证。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="install">
+      <div class="page-inner">
+        <div class="eyebrow">Install & Invoke</div>
+        <h2>统一安装、统一鉴权、统一结果链接</h2>
+        <p class="lead">OpenClaw 可从技能商店安装或添加本仓库；Claude Code 可请求安装 sciminer-skills。所有 skill 都要求 SciMiner API key。</p>
+        <div class="grid two">
+          <article class="card" style="--accent: var(--teal)">
+            <span class="tag">Credential</span>
+            <h3>环境变量</h3>
+            <p>从 SciMiner 获取免费 API key 后，设置 <strong>SCIMINER_API_KEY</strong>。调用时以 <strong>X-Auth-Token</strong> header 发送。</p>
+            <div class="chips"><span class="chip">https://sciminer.tech/utility</span><span class="chip">SCIMINER_API_KEY</span></div>
+          </article>
+          <article class="card" style="--accent: var(--blue)">
+            <span class="tag">Result</span>
+            <h3>任务状态与分享链接</h3>
+            <p>内部 API 返回 task_id，轮询 result endpoint 后得到 SUCCESS/FAILURE、result 内容和可在线查看的 share_url。</p>
+            <div class="chips"><span class="chip">task_id</span><span class="chip">status</span><span class="chip">share_url</span></div>
+          </article>
+        </div>
+        <div class="codebox" aria-label="SciMiner API 调用示意">
+          <pre><code>BASE_URL = "https://sciminer.tech/console/api"
+headers = {"X-Auth-Token": SCIMINER_API_KEY, "Content-Type": "application/json"}
+
+payload = {
+    "provider_name": "PocketXMol",
+    "tool_name": "sbdd_gpu_sbdd_gpu_post",
+    "parameters": {"protein": "&lt;FILE_ID&gt;", "binding_site": "Center:10,12,8;Size:20"}
+}
+
+POST /v1/internal/tools/invoke  →  task_id
+GET  /v1/internal/tools/result  →  status, result, share_url</code></pre>
+        </div>
+        <div class="footer-band">
+          <div>
+            <strong>SciMiner Skills Repository</strong><br />
+            本海报基于仓库 README 与 10 个 SKILL.md 汇总生成，适合网页展示、会议屏幕滚动播放或 A4 竖版分页打印。<br />
+            GitHub: <a href="https://github.com/SciMiner/sciminer-skills" target="_blank" rel="noopener">https://github.com/SciMiner/sciminer-skills</a>
+          </div>
+          <div class="qr-box" aria-label="GitHub 仓库二维码">
+            <img src="image.png" alt="SciMiner Skills GitHub 仓库二维码" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  <div class="print-note">提示：浏览器打印可生成多页竖版 PDF</div>
+</body>
+</html>
