@@ -7,8 +7,10 @@ import path from 'node:path';
 const execFileAsync = promisify(execFile);
 
 const root = process.cwd();
-const htmlPath = path.join(root, 'poster.html');
-const outputDir = path.join(root, 'poster-pages');
+const inputHtml = process.argv[2] ?? 'poster.html';
+const outputFolder = process.argv[3] ?? 'poster-pages';
+const htmlPath = path.join(root, inputHtml);
+const outputDir = path.join(root, outputFolder);
 const chromePath = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const tempPath = path.join(root, '.poster-export.html');
 
@@ -66,7 +68,7 @@ for (const [id, filename] of pages) {
     pathToFileURL(tempPath).href,
   ], { timeout: 60000 });
 
-  console.log(`wrote ${path.join('poster-pages', filename)}`);
+  console.log(`wrote ${path.join(outputFolder, filename)}`);
 }
 
 await rm(tempPath, { force: true });
