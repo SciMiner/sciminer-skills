@@ -1,1 +1,1 @@
-# admet-prediction skill package
+"""ADMET and PKPD skill package."""
