@@ -110,7 +110,7 @@ TOOLS_REGISTRY = {
         }
     },
     "IgFold Structure Prediction": {
-        "provider_name": "IgFold - Antibody Structure Prediction",
+        "provider_name": "IgFold",
         "description": "Predict antibody 3D structures from heavy and optional light chain sequences.",
         "category": "3D Structural Modeling",
         "interfaces": {

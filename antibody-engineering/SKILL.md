@@ -39,7 +39,7 @@ This skill supports end-to-end antibody engineering workflows, including:
 
 ### Phase 2: Modeling and Relaxation
 
-- Use `predict_predict_post` from `IgFold - Antibody Structure Prediction` for the parental antibody and shortlisted sequence variants.
+- Use `predict_predict_post` from `IgFold` for the parental antibody and shortlisted sequence variants.
 - For standard antibodies, provide paired heavy and light chains; for nanobody-like workflows, omit the light chain.
 - If affinity optimization is in scope, prefer an antibody-antigen complex structure for downstream scoring.
 - Use `fastrelax_fastrelax_post` from `Rosetta FastRelax` immediately after IgFold to reduce local clashes and move the model toward a more physically reasonable energy minimum.
@@ -195,7 +195,7 @@ file_id = resp.json()["file_id"]
 - `mutate_mutate__post` — apply explicit point mutations to humanized heavy/light chains and re-evaluate humanness
 
 ### IgFold
-- provider_name: `IgFold - Antibody Structure Prediction`
+- provider_name: `IgFold`
 - `predict_predict_post` — predict antibody 3D structures from heavy and optional light chain sequences
 
 ### FoldX
