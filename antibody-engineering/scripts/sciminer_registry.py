@@ -336,3 +336,50 @@ def list_tools(category: str = None) -> list:
         {"name": name, "category": info.get("category"), "description": info.get("description")}
         for name, info in TOOLS_REGISTRY.items()
     ]
+
+
+def get_default_interface(tool_name: str) -> dict:
+    """Return the default interface metadata for a tool."""
+    info = get_tool_info(tool_name)
+    if not info:
+        return None
+    interfaces = info.get("interfaces") or {}
+    if not interfaces:
+        return None
+    return interfaces.get("default") or list(interfaces.values())[0]
+
+
+def build_payload_from_registry(tool_name: str, user_parameters: dict) -> dict:
+    """Build a SciMiner invoke payload strictly from registry-defined metadata.
+
+    - provider_name and tool_name come from the registry, never from caller input.
+    - user_parameters are filtered against the registry's allowed parameter keys.
+    - Required parameters are validated; missing ones raise ValueError.
+    """
+    info = get_tool_info(tool_name)
+    if not info:
+        raise ValueError(f"Unknown tool: {tool_name}")
+
+    interface = get_default_interface(tool_name)
+    if not interface:
+        raise ValueError(f"No interface found for tool: {tool_name}")
+
+    allowed_params = interface.get("parameters", {})
+    filtered_parameters = {
+        key: value
+        for key, value in (user_parameters or {}).items()
+        if key in allowed_params and value is not None
+    }
+
+    missing_required = [
+        key for key, meta in allowed_params.items()
+        if meta.get("required") and key not in filtered_parameters
+    ]
+    if missing_required:
+        raise ValueError(f"Missing required parameters: {sorted(missing_required)}")
+
+    return {
+        "provider_name": info["provider_name"],
+        "tool_name": interface["tool_name"],
+        "parameters": filtered_parameters,
+    }

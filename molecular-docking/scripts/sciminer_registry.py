@@ -23,7 +23,7 @@ TOOLS_REGISTRY = {
                     "receptor": {"type": "file", "required": True, "description": "Receptor structure file (pdb/cif)"},
                     "ligand_to_dock": {"type": "file", "required": True, "description": "Ligand file to dock (sdf/pdb/smi/txt)"},
                     "reference_ligand": {"type": "file", "required": False, "description": "Reference ligand file for pocket guidance (sdf)"},
-                    "pocket_info": {"type": "string", "required": False, "description": "Pocket details from pocket-center-picker"},
+                    "pocket_info": {"type": "string", "required": False, "description": "Pocket details, e.g. Center:-0.89,14.89,8.43;Size:20,20,20"},
                     "num_modes": {"type": "integer", "required": True, "description": "Number of docking modes to generate"},
                 },
                 "file_params": ["receptor", "ligand_to_dock", "reference_ligand"],
@@ -42,7 +42,7 @@ TOOLS_REGISTRY = {
                     "receptor": {"type": "file", "required": True, "description": "Receptor file (pdb/pdbqt)"},
                     "ligand_to_dock": {"type": "file", "required": True, "description": "Ligand file (pdb/pdbqt/sdf)"},
                     "reference_ligand": {"type": "file", "required": False, "description": "Reference ligand to define pocket center (sdf/pdb)"},
-                    "pocket_info": {"type": "string", "required": False, "description": "Pocket information from pocket-center-picker"},
+                    "pocket_info": {"type": "string", "required": False, "description": "Pocket information, e.g. Center:-0.89,14.89,8.43;Size:20,20,20"},
                     "num_modes": {"type": "integer", "required": True, "description": "Number of binding modes to generate"},
                 },
                 "file_params": ["receptor", "ligand_to_dock", "reference_ligand"],
@@ -61,7 +61,7 @@ TOOLS_REGISTRY = {
                     "receptor": {"type": "file", "required": True, "description": "Complete protein file (pdb/cif)"},
                     "ligand_to_dock": {"type": "file", "required": True, "description": "Ligand file to dock (sdf/mol2/pdb)"},
                     "reference_ligand": {"type": "file", "required": False, "description": "Reference ligand file (sdf/pdb)"},
-                    "pocket_info": {"type": "string", "required": False, "description": "Pocket information from pocket-center-picker"},
+                    "pocket_info": {"type": "string", "required": False, "description": "Pocket details, e.g. Center:-0.89,14.89,8.43;Size:20,20,20"},
                     "num_apo_conformers": {"type": "integer", "required": False, "description": "Number of apo conformers", "default": 1},
                     "num_holo_conformers": {"type": "integer", "required": False, "description": "Number of holo conformers", "default": 5},
                     "vina_sample": {"type": "integer", "required": False, "description": "Number of Vina poses kept", "default": 9},
@@ -82,7 +82,7 @@ TOOLS_REGISTRY = {
                     "protein": {"type": "file", "required": True, "description": "Protein file (pdb)"},
                     "ligand_to_dock": {"type": "file", "required": True, "description": "Ligand file (sdf/mol2/csv/txt/smi)"},
                     "reference_ligand": {"type": "file", "required": False, "description": "Reference ligand file (sdf)"},
-                    "pocket_info": {"type": "string", "required": False, "description": "Pocket information from pocket-center-picker"},
+                    "pocket_info": {"type": "string", "required": False, "description": "Pocket information, e.g. Center:-0.89,14.89,8.43;Size:20,20,20"},
                     "samples_per_complex": {"type": "integer", "required": False, "description": "Samples per complex", "default": 10},
                 },
                 "file_params": ["protein", "ligand_to_dock", "reference_ligand"],
@@ -100,6 +100,7 @@ TOOLS_REGISTRY = {
                 "parameters": {
                     "protein_file": {"type": "file", "required": True, "description": "Protein file (pdb/fasta/txt)"},
                     "ligand_file": {"type": "file", "required": True, "description": "Ligand file (sdf/mol2/txt/smi)"},
+                    "pocket_info": {"type": "string", "required": False, "description": "Pocket information, e.g. Center:-0.89,14.89,8.43;Size:20,20,20"},
                     "samples_per_complex": {"type": "integer", "required": False, "description": "Samples per complex", "default": 10},
                 },
                 "file_params": ["protein_file", "ligand_file"],
@@ -253,3 +254,43 @@ def list_tools(category: str = None) -> list:
         {"name": name, "category": info.get("category"), "description": info.get("description")}
         for name, info in TOOLS_REGISTRY.items()
     ]
+
+
+def get_default_interface(tool_name: str) -> dict:
+    """Return the default interface metadata for a tool."""
+    info = get_tool_info(tool_name)
+    if not info:
+        return None
+    interfaces = info.get("interfaces") or {}
+    return interfaces.get("default") or (list(interfaces.values())[0] if interfaces else None)
+
+
+def build_payload_from_registry(tool_name: str, user_parameters: dict) -> dict:
+    """Build an invoke payload strictly from registry-defined metadata."""
+    info = get_tool_info(tool_name)
+    if not info:
+        raise ValueError(f"Unknown tool: {tool_name}")
+
+    interface = get_default_interface(tool_name)
+    if not interface:
+        raise ValueError(f"No interface found for tool: {tool_name}")
+
+    allowed_params = interface.get("parameters", {})
+    filtered_parameters = {
+        key: value
+        for key, value in (user_parameters or {}).items()
+        if key in allowed_params and value is not None
+    }
+
+    missing_required = [
+        key for key, meta in allowed_params.items()
+        if meta.get("required") and key not in filtered_parameters
+    ]
+    if missing_required:
+        raise ValueError(f"Missing required parameters: {sorted(missing_required)}")
+
+    return {
+        "provider_name": info["provider_name"],
+        "tool_name": interface["tool_name"],
+        "parameters": filtered_parameters,
+    }

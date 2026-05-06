@@ -50,15 +50,43 @@ Agents should remember the credential file path, not the credential value. For p
 
 If `~/.config/sciminer/credentials.json` is not available or does not contain an `api_key` field, stop and tell the user to obtain a free SciMiner API key from `https://sciminer.tech/utility` and store it in that file. Do not try to complete the task by switching to other tools or services.
 
+## Authoritative payload source (required)
+
+The registry at `admet-pkpd/scripts/sciminer_registry.py` is the **single source of truth** for `provider_name`, `tool_name`, allowed `parameters`, and `file_params`. The agent MUST:
+
+1. Resolve the selected tool via `get_tool_info(tool_name)` or `build_payload_from_registry(tool_name, user_parameters)` before every invocation.
+2. Never invent payload keys from memory or copy them from OpenAPI text.
+3. Filter user-provided parameters against the registry's `parameters` keys.
+4. Validate required parameters before invoking.
+5. Cite `admet-pkpd/scripts/sciminer_registry.py` as the payload source in summaries.
+
+If a user-provided parameter is not present in the selected registry interface, ask for correction or drop it with an explanation.
+
+Recommended pattern:
+
+```python
+# Adjust import path to runtime (e.g., sys.path or package layout)
+from admet_pkpd.scripts.sciminer_registry import build_payload_from_registry
+
+user_parameters = {
+    # ... registry-defined keys only ...
+}
+payload = build_payload_from_registry("<Registry Tool Name>", user_parameters)
+# payload is ready for POST {BASE_URL}/v1/internal/tools/invoke
+```
+
 ## Invocation pattern
 
-Always invoke via SciMiner's internal API using `BASE_URL`.
+Always invoke via SciMiner's internal API using `BASE_URL`. Construct the payload from the registry, upload any file inputs, then submit and poll.
 
 ```python
 import json
 from pathlib import Path
 import requests
 import time
+
+# Adjust import path to runtime (e.g., sys.path or package layout)
+from admet_pkpd.scripts.sciminer_registry import build_payload_from_registry
 
 BASE_URL = "https://sciminer.tech/console/api"
 CREDENTIALS_PATH = Path.home() / ".config" / "sciminer" / "credentials.json"
@@ -70,7 +98,6 @@ def load_api_key():
             f"SciMiner credentials file not found: {CREDENTIALS_PATH}. "
             "Create it with an api_key field."
         )
-
     credentials = json.loads(CREDENTIALS_PATH.read_text())
     api_key = credentials.get("api_key")
     if not api_key:
@@ -79,31 +106,51 @@ def load_api_key():
 
 
 API_KEY = load_api_key()
+auth_header = {"X-Auth-Token": API_KEY}
 
-headers = {
-    "X-Auth-Token": API_KEY,
-    "Content-Type": "application/json",
+
+def upload_file(path: str, field: str = "file") -> str:
+    """Upload a local file and return the SciMiner file_id.
+
+    Use field="input_csv" for DeepEsol file uploads; default "file" for others.
+    """
+    with open(path, "rb") as fh:
+        resp = requests.post(
+            f"{BASE_URL}/v1/internal/tools/file",
+            files={field: fh},
+            headers=auth_header,
+            timeout=60,
+        )
+    resp.raise_for_status()
+    return resp.json()["file_id"]
+
+
+# 1. (Optional) Upload file inputs and collect file_ids for `file_params`
+# molecules_id = upload_file("path/to/molecules.txt")
+
+# 2. Build payload strictly from registry metadata
+user_parameters = {
+    "smiles": "Cc1ccc(S(=O)(=O)Nc2ccc(C)cc2)cc1\nCc1ncc(C(=O)O)cc1",
+    "features": ["A", "D", "M", "E", "T"],
 }
+payload = build_payload_from_registry("ADMET Predictor SMILES", user_parameters)
 
-# Example: predict full ADMET profile for two molecules
-payload = {
-    "provider_name": "ADMET Predictor",
-    "tool_name": "ADMET_smiles_admet_post",
-    "parameters": {
-        "smiles": "Cc1ccc(S(=O)(=O)Nc2ccc(C)cc2)cc1\nCc1ncc(C(=O)O)cc1",
-        "features": ["A", "D", "M", "E", "T"],
-    }
-}
-
-resp = requests.post(f"{BASE_URL}/v1/internal/tools/invoke", json=payload, headers=headers, timeout=30)
+# 3. Invoke
+resp = requests.post(
+    f"{BASE_URL}/v1/internal/tools/invoke",
+    json=payload,
+    headers={**auth_header, "Content-Type": "application/json"},
+    timeout=30,
+)
 resp.raise_for_status()
 task_id = resp.json()["task_id"]
 
+# 4. Poll for result
 for _ in range(300):
     status_resp = requests.get(
         f"{BASE_URL}/v1/internal/tools/result",
         params={"task_id": task_id},
-        headers={"X-Auth-Token": API_KEY},
+        headers=auth_header,
         timeout=10,
     )
     status_resp.raise_for_status()
@@ -114,23 +161,14 @@ for _ in range(300):
     time.sleep(2)
 ```
 
-## File upload
+> The example uses the registry-friendly tool name `"ADMET Predictor SMILES"`. If your registry exposes a different friendly name, look it up via `get_tool_info(...)` or `list_tools(...)` first.
 
-If a tool requires a file input, upload the file first:
+## File upload rules
 
-```python
-files = {"file": open("path/to/molecules.txt", "rb")}
-resp = requests.post(
-    f"{BASE_URL}/v1/internal/tools/file",
-    files=files,
-    headers={"X-Auth-Token": API_KEY},
-    timeout=60,
-)
-resp.raise_for_status()
-file_id = resp.json()["file_id"]
-```
-
-Then place that `file_id` into the matching parameter in `payload["parameters"]`. For `DeepEsol File`, use the key `input_csv`; for all other file-upload tools in this skill, use the key `file`.
+- Upload every parameter listed in the registry's `file_params` via `/v1/internal/tools/file` before invocation.
+- Replace local paths in `parameters` with the returned `file_id` strings.
+- Use the upload form field `input_csv` for `DeepEsol File`; use `file` for all other file-upload tools in this skill.
+- Skip `file_params` entries that the user did not provide; only required file params must be present.
 
 ## Expected result format
 
@@ -188,6 +226,7 @@ Then place that `file_id` into the matching parameter in `payload["parameters"]`
 ## Notes
 
 - Use SciMiner `BASE_URL` for all invocations.
+- Use `admet-pkpd/scripts/sciminer_registry.py` as the authoritative source for payload construction (`build_payload_from_registry`).
 - This skill requires a persistent credential stored at `~/.config/sciminer/credentials.json` with an `api_key` field. The value is sent as the `X-Auth-Token` header.
 - If the API key file or `api_key` field is missing, stop and notify the user to get the free key from `https://sciminer.tech/utility` and store it in `~/.config/sciminer/credentials.json`.
 - Agents should remember only the credential file path and handling rule, never the API key value itself.
