@@ -12,7 +12,6 @@ This skill groups protein-ligand docking workflows, including:
 - flexible docking with PackDock
 - surface-geometry-assisted docking with SurfDock
 - diffusion-model docking with DiffDock
-- native binding-site extraction with Get Box
 - predicted binding-site detection with fpocket
 - side-by-side comparison across multiple docking engines
 
@@ -34,7 +33,6 @@ Docking engines:
 - For comparison, benchmarking, or "try multiple methods" requests, invoke multiple engines and aggregate metrics.
 
 Binding-site acquisition (run before docking when no `pocket_info` or `reference_ligand` is supplied):
-- Use `Get Box` to obtain the **native** ligand binding site (from a known holo structure or PDB ID).
 - Use `fpocket` to acquire a **predicted** binding site (apo structure or no known ligand).
 
 Pocket inputs:
@@ -194,10 +192,6 @@ for _ in range(300):
 - provider_name: `DiffDock`
 - `diffdock_get_diffdock_info_post` — diffusion-model docking for protein-ligand complex pose prediction
 
-### Get Box
-- provider_name: `Get Box`
-- `calculate_box_calculate_post` — obtain the native ligand binding site box from a binding-site description and optional PDB/CIF file
-
 ### fpocket
 - provider_name: `fpocket`
 - `run_fpocket_run_fpocket_post` — predict protein binding pockets from an uploaded protein structure
@@ -205,7 +199,7 @@ for _ in range(300):
 ## Workflow guidance
 
 Standard single-engine docking:
-1. If no `pocket_info` and no `reference_ligand`, run `Get Box` (native pocket known) or `fpocket` (predicted pocket) first.
+1. If no `pocket_info` and no `reference_ligand`, run `fpocket` (predicted pocket) first.
 2. Map the resulting pocket center/size into `pocket_info` for the chosen docking engine.
 3. Invoke the docking engine via `build_payload_from_registry(...)`.
 

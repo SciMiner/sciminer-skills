@@ -134,19 +134,21 @@ TOOLS_REGISTRY = {
             }
         }
     },
-    "Get Box": {
-        "provider_name": "Get Box",
-        "description": "Calculate a docking box from a binding-site description and optional structure input.",
+    "fpocket": {
+        "provider_name": "fpocket",
+        "description": "Predict protein binding pockets from a receptor structure for structure-based molecule design.",
         "category": "Design Utilities",
         "interfaces": {
             "default": {
-                "tool_name": "calculate_box_calculate_post",
-                "description": "Calculate pocket center and box size for downstream structure-based design.",
+                "tool_name": "run_fpocket_run_fpocket_post",
+                "description": "Run fpocket to detect and score predicted pockets from an uploaded protein structure.",
                 "parameters": {
-                    "binding_site": {"type": "string", "required": True, "description": "Natural-language binding-site description"},
-                    "pdb_file": {"type": "file", "required": False, "description": "Optional PDB or CIF structure file"},
+                    "protein_file": {"type": "file", "required": True, "description": "Protein structure file for pocket detection"},
+                    "ligand_chain": {"type": "string", "required": False, "description": "Optional ligand chain ID"},
+                    "pocket_min_size": {"type": "number", "required": False, "description": "Minimum detectable pocket size", "default": 3.4},
+                    "pocket_max_size": {"type": "number", "required": False, "description": "Maximum detectable pocket size", "default": 6.2},
                 },
-                "file_params": ["pdb_file"],
+                "file_params": ["protein_file"],
             }
         }
     },
@@ -198,9 +200,11 @@ KEYWORD_TOOL_MAP = {
     "binding pocket": "PocketXMol SBDD",
     "fragment linking": "PocketXMol SBDD",
     "fragment growing": "PocketXMol SBDD",
-    "get box": "Get Box",
-    "binding site": "Get Box",
-    "docking box": "Get Box",
+    "get box": "fpocket",
+    "binding site": "fpocket",
+    "docking box": "fpocket",
+    "fpocket": "fpocket",
+    "predicted pocket": "fpocket",
     "gnina": "Gnina Score Single",
     "score molecules": "Gnina Score Single",
     "validate molecules": "Gnina Score Single",
@@ -276,3 +280,50 @@ def list_tools(category: str = None) -> list:
         {"name": name, "category": info.get("category"), "description": info.get("description")}
         for name, info in TOOLS_REGISTRY.items()
     ]
+
+
+def get_default_interface(tool_name: str) -> dict:
+    """Return the default interface metadata for a tool."""
+    info = get_tool_info(tool_name)
+    if not info:
+        return None
+    interfaces = info.get("interfaces") or {}
+    if not interfaces:
+        return None
+    return interfaces.get("default") or list(interfaces.values())[0]
+
+
+def build_payload_from_registry(tool_name: str, user_parameters: dict) -> dict:
+    """Build a SciMiner invoke payload strictly from registry-defined metadata.
+
+    - provider_name and tool_name come from the registry, never from caller input.
+    - user_parameters are filtered against the registry's allowed parameter keys.
+    - Required parameters are validated; missing ones raise ValueError.
+    """
+    info = get_tool_info(tool_name)
+    if not info:
+        raise ValueError(f"Unknown tool: {tool_name}")
+
+    interface = get_default_interface(tool_name)
+    if not interface:
+        raise ValueError(f"No interface found for tool: {tool_name}")
+
+    allowed_params = interface.get("parameters", {})
+    filtered_parameters = {
+        key: value
+        for key, value in (user_parameters or {}).items()
+        if key in allowed_params and value is not None
+    }
+
+    missing_required = [
+        key for key, meta in allowed_params.items()
+        if meta.get("required") and key not in filtered_parameters
+    ]
+    if missing_required:
+        raise ValueError(f"Missing required parameters: {sorted(missing_required)}")
+
+    return {
+        "provider_name": info["provider_name"],
+        "tool_name": interface["tool_name"],
+        "parameters": filtered_parameters,
+    }

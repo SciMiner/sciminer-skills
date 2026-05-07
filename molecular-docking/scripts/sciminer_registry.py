@@ -107,22 +107,6 @@ TOOLS_REGISTRY = {
             }
         },
     },
-    "Get Box": {
-        "provider_name": "Get Box",
-        "description": "Obtain native ligand binding-site box parameters from natural-language site descriptions and optional structures.",
-        "category": "Binding Site Utilities",
-        "interfaces": {
-            "default": {
-                "tool_name": "calculate_box_calculate_post",
-                "description": "Calculate docking box center and size for a native ligand binding site.",
-                "parameters": {
-                    "binding_site": {"type": "string", "required": True, "description": "Natural-language binding-site description; can include PDB ID"},
-                    "pdb_file": {"type": "file", "required": False, "description": "Optional protein structure file (pdb/cif)"},
-                },
-                "file_params": ["pdb_file"],
-            }
-        },
-    },
     "fpocket": {
         "provider_name": "fpocket",
         "description": "Predict binding pockets from protein structures when native pocket annotations are unavailable.",
@@ -158,9 +142,6 @@ KEYWORD_TOOL_MAP = {
     "flex docking": "PackDock",
     "surfdock": "SurfDock",
     "diffdock": "DiffDock",
-    "get box": "Get Box",
-    "native ligand binding site": "Get Box",
-    "native binding site": "Get Box",
     "fpocket": "fpocket",
     "predicted binding site": "fpocket",
     "pocket prediction": "fpocket",
