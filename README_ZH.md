@@ -19,6 +19,7 @@ SciMiner 技能集
 - `synthesis-evaluation`：合成规划与评估（逆合成建议、路线评分、可行性与构建块分析）。需要 `SCIMINER_API_KEY`。ClawHub: https://clawhub.ai/sciminer/synthesis-evaluation
 - `optical-chemical-structure-recognition`：光学化学结构识别（从图像或文献图中提取化学结构、图像转 SMILES、结构解析）。需要 `SCIMINER_API_KEY`。ClawHub: https://clawhub.ai/sciminer/optical-chemical-structure-recognition
 - `binding-site-prediction`：蛋白结合位点与口袋预测工作流（P2Rank 机器学习口袋排名、fpocket 几何检测、AF2BIND 残基级结合概率评分）。需要 `SCIMINER_API_KEY`。ClawHub: https://clawhub.ai/sciminer/binding-site-prediction
+- `pharma-intelligence`：全球医药情报与生物医学研究工作流（覆盖多地区监管状态、临床试验、安全性、专利、竞品格局、文献与靶点发现）。需要 `SCIMINER_API_KEY`。ClawHub: https://clawhub.ai/sciminer/pharma-intelligence
 - `antibody-engineering`：端到端抗体工程工作流，整合 ANARCI、BioPhi、IgFold、FoldX 和 Rosetta（序列编号、人源化、结构预测、可开发性分析、亲和力优化与精准重设计）。需要 `SCIMINER_API_KEY`。ClawHub: https://clawhub.ai/sciminer/antibody-engineering
 
 备注
