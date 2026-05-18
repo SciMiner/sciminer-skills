@@ -1,6 +1,8 @@
 ---
 name: admet-pkpd
 description: ADMET and pharmacokinetic/pharmacodynamic property prediction workflows using ADMET Predictor, AOMP, OBA, Graph-pKa, DeepEsol, and Molecular Descriptors through SciMiner.
+required_environment_variables:
+    - SCIMINER_API_KEY
 ---
 
 # ADMET & PKPD Skill
@@ -35,20 +37,11 @@ This skill groups property prediction workflows for assessing the pharmacokineti
 
 ## Prerequisites
 
-1. Get a free SciMiner API key from `https://sciminer.tech/utility`
-2. Store the required credential in a persistent user-level config file that is outside this repository.
-3. Configure:
+1. `SCIMINER_API_KEY` is pre-obtained by the SciMiner-Hermes gateway before the agent run reaches this skill.
+2. Use the runtime `SCIMINER_API_KEY` directly as the `X-Auth-Token` for SciMiner tool calls.
+3. Do not request, derive, print, persist, or write this key to any file.
 
-```bash
-mkdir -p ~/.config/sciminer
-chmod 700 ~/.config/sciminer
-printf '{"api_key":"your_api_key_here"}\n' > ~/.config/sciminer/credentials.json
-chmod 600 ~/.config/sciminer/credentials.json
-```
-
-Agents should remember the credential file path, not the credential value. For persistent agent behavior across tasks, add an instruction to the relevant agent memory or project instruction file such as `CLAUDE.md`, `AGENTS.md`, or the Codex equivalent: "For SciMiner calls, read the API key from `~/.config/sciminer/credentials.json`; never print or store the API key in prompts, logs, or repository files."
-
-If `~/.config/sciminer/credentials.json` is not available or does not contain an `api_key` field, stop and tell the user to obtain a free SciMiner API key from `https://sciminer.tech/utility` and store it in that file. Do not try to complete the task by switching to other tools or services.
+If `SCIMINER_API_KEY` is not available at skill runtime, stop and report that the gateway did not inject the required credential. Do not try to derive it inside the skill or switch to other tools or services.
 
 ## Authoritative payload source (required)
 
@@ -80,8 +73,7 @@ payload = build_payload_from_registry("<Registry Tool Name>", user_parameters)
 Always invoke via SciMiner's internal API using `BASE_URL`. Construct the payload from the registry, upload any file inputs, then submit and poll.
 
 ```python
-import json
-from pathlib import Path
+import os
 import requests
 import time
 
@@ -89,24 +81,15 @@ import time
 from admet_pkpd.scripts.sciminer_registry import build_payload_from_registry
 
 BASE_URL = "https://sciminer.tech/console/api"
-CREDENTIALS_PATH = Path.home() / ".config" / "sciminer" / "credentials.json"
 
+API_KEY = os.environ.get("SCIMINER_API_KEY")
+if not API_KEY:
+    raise RuntimeError("SCIMINER_API_KEY is not set; the gateway did not inject the required credential")
 
-def load_api_key():
-    if not CREDENTIALS_PATH.exists():
-        raise FileNotFoundError(
-            f"SciMiner credentials file not found: {CREDENTIALS_PATH}. "
-            "Create it with an api_key field."
-        )
-    credentials = json.loads(CREDENTIALS_PATH.read_text())
-    api_key = credentials.get("api_key")
-    if not api_key:
-        raise ValueError(f"Missing api_key in {CREDENTIALS_PATH}")
-    return api_key
-
-
-API_KEY = load_api_key()
-auth_header = {"X-Auth-Token": API_KEY}
+headers = {
+    "X-Auth-Token": API_KEY,
+    "Content-Type": "application/json",
+}
 
 
 def upload_file(path: str, field: str = "file") -> str:
@@ -118,7 +101,7 @@ def upload_file(path: str, field: str = "file") -> str:
         resp = requests.post(
             f"{BASE_URL}/v1/internal/tools/file",
             files={field: fh},
-            headers=auth_header,
+            headers=headers,
             timeout=60,
         )
     resp.raise_for_status()
@@ -139,7 +122,7 @@ payload = build_payload_from_registry("ADMET Predictor SMILES", user_parameters)
 resp = requests.post(
     f"{BASE_URL}/v1/internal/tools/invoke",
     json=payload,
-    headers={**auth_header, "Content-Type": "application/json"},
+    headers=headers,
     timeout=30,
 )
 resp.raise_for_status()
@@ -150,7 +133,7 @@ for _ in range(300):
     status_resp = requests.get(
         f"{BASE_URL}/v1/internal/tools/result",
         params={"task_id": task_id},
-        headers=auth_header,
+        headers=headers,
         timeout=10,
     )
     status_resp.raise_for_status()
@@ -227,9 +210,8 @@ for _ in range(300):
 
 - Use SciMiner `BASE_URL` for all invocations.
 - Use `admet-pkpd/scripts/sciminer_registry.py` as the authoritative source for payload construction (`build_payload_from_registry`).
-- This skill requires a persistent credential stored at `~/.config/sciminer/credentials.json` with an `api_key` field. The value is sent as the `X-Auth-Token` header.
-- If the API key file or `api_key` field is missing, stop and notify the user to get the free key from `https://sciminer.tech/utility` and store it in `~/.config/sciminer/credentials.json`.
-- Agents should remember only the credential file path and handling rule, never the API key value itself.
+- This skill requires the `SCIMINER_API_KEY` environment variable to be injected by the SciMiner-Hermes gateway before skill execution. The API key is sent as the `X-Auth-Token` header.
+- If `SCIMINER_API_KEY` is not available at skill runtime, stop and report that the gateway did not inject the required credential. Do not attempt to derive or locate the API key through other means.
 - `provider_name` must exactly match the values in `admet-pkpd/scripts/sciminer_registry.py`.
 - The `features` parameter for ADMET Predictor is optional; omitting it returns all endpoints. Passing category letters (`A`, `D`, `M`, `E`, `T`) returns all endpoints within that category.
 - The `DeepEsol` SMILES endpoint uses `application/x-www-form-urlencoded` encoding; pass `smiles` as a list of strings inside `parameters`.
