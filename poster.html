@@ -690,7 +690,7 @@
           <div class="stats" aria-label="核心统计">
             <div class="stat"><b>10</b><span>个可安装 skill，面向药物发现关键任务</span></div>
             <div class="stat"><b>40+</b><span>个 SciMiner 内部工具与模型入口</span></div>
-            <div class="stat"><b>1</b><span>个统一凭证：SCIMINER_API_KEY</span></div>
+            <div class="stat"><b>1</b><span>个统一凭证文件：~/.config/sciminer/credentials.json</span></div>
           </div>
           <a class="repo-link" href="https://github.com/SciMiner/sciminer-skills" target="_blank" rel="noopener">github.com/SciMiner/sciminer-skills</a>
         </div>
@@ -881,13 +881,13 @@
       <div class="page-inner">
         <div class="eyebrow">Install & Invoke</div>
         <h2>统一安装、统一鉴权、统一结果链接</h2>
-        <p class="lead">OpenClaw 可从技能商店安装或添加本仓库；Claude Code 可请求安装 sciminer-skills。所有 skill 都要求 SciMiner API key。</p>
+        <p class="lead">OpenClaw 可从技能商店安装或添加本仓库；Claude Code 可请求安装 sciminer-skills。所有 skill 都要求 SciMiner API key，并统一从 <code>~/.config/sciminer/credentials.json</code> 读取。</p>
         <div class="grid two">
           <article class="card" style="--accent: var(--teal)">
             <span class="tag">Credential</span>
-            <h3>环境变量</h3>
-            <p>从 SciMiner 获取免费 API key 后，设置 <strong>SCIMINER_API_KEY</strong>。调用时以 <strong>X-Auth-Token</strong> header 发送。</p>
-            <div class="chips"><span class="chip">https://sciminer.tech/utility</span><span class="chip">SCIMINER_API_KEY</span></div>
+            <h3>凭证文件</h3>
+            <p>从 SciMiner 获取免费 API key 后，将其保存到 <strong>~/.config/sciminer/credentials.json</strong> 的 <strong>api_key</strong> 字段中。调用时以 <strong>X-Auth-Token</strong> header 发送。</p>
+            <div class="chips"><span class="chip">https://sciminer.tech/utility</span><span class="chip">credentials.json</span><span class="chip">api_key</span></div>
           </article>
           <article class="card" style="--accent: var(--blue)">
             <span class="tag">Result</span>
@@ -897,8 +897,12 @@
           </article>
         </div>
         <div class="codebox" aria-label="SciMiner API 调用示意">
-          <pre><code>BASE_URL = "https://sciminer.tech/console/api"
-headers = {"X-Auth-Token": SCIMINER_API_KEY, "Content-Type": "application/json"}
+          <pre><code>import json
+from pathlib import Path
+
+BASE_URL = "https://sciminer.tech/console/api"
+credentials = json.loads(Path.home().joinpath(".config", "sciminer", "credentials.json").read_text())
+headers = {"X-Auth-Token": credentials["api_key"], "Content-Type": "application/json"}
 
 payload = {
     "provider_name": "PocketXMol",
