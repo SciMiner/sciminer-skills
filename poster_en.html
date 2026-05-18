@@ -994,14 +994,39 @@
 from pathlib import Path
 
 BASE_URL = "https://sciminer.tech/console/api"
-credentials = json.loads(Path.home().joinpath(".config", "sciminer", "credentials.json").read_text())
-headers = {"X-Auth-Token": credentials["api_key"], "Content-Type": "application/json"}
+CREDENTIALS_PATH = Path.home() / ".config" / "sciminer" / "credentials.json"
+
+def load_api_key():
+    if not CREDENTIALS_PATH.exists():
+        raise FileNotFoundError(
+            f"SciMiner credentials file not found at {CREDENTIALS_PATH}. "
+            "Please create it with your API key from https://sciminer.tech/utility"
+        )
+    try:
+        credentials = json.loads(CREDENTIALS_PATH.read_text())
+    except json.JSONDecodeError as exc:
+        raise ValueError(
+            f"SciMiner credentials file at {CREDENTIALS_PATH} contains invalid JSON. "
+            "Please store your API key as {'api_key':'your_api_key_here'}."
+        ) from exc
+    api_key = credentials.get("api_key")
+    if not api_key:
+        raise ValueError(
+            f"The 'api_key' field is missing or empty in {CREDENTIALS_PATH}. "
+            "Please add your SciMiner API key."
+        )
+    return api_key
+
+def make_headers():
+    return {"X-Auth-Token": load_api_key(), "Content-Type": "application/json"}
 
 payload = {
     "provider_name": "PocketXMol",
     "tool_name": "sbdd_gpu_sbdd_gpu_post",
     "parameters": {"protein": "&lt;FILE_ID&gt;", "binding_site": "Center:10,12,8;Size:20"}
 }
+
+headers = make_headers()
 
 POST /v1/internal/tools/invoke  →  task_id
 GET  /v1/internal/tools/result  →  status, result, share_url</code></pre>
