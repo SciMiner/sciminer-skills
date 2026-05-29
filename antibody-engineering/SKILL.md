@@ -161,9 +161,12 @@ resp = requests.post(
 )
 resp.raise_for_status()
 task_id = resp.json()["task_id"]
+share_url = f"https://sciminer.tech/share?id={task_id}&type=API_TOOL"
 
-# 4. Poll for result
-for _ in range(300):
+# 4. Poll for result for up to 28800 seconds, then return the URL for later follow-up
+deadline = time.time() + 28800
+last_result = {"status": "RUNNING", "task_id": task_id, "share_url": share_url}
+while time.time() < deadline:
     status_resp = requests.get(
         f"{BASE_URL}/v1/internal/tools/result",
         params={"task_id": task_id},
@@ -172,10 +175,22 @@ for _ in range(300):
     )
     status_resp.raise_for_status()
     result = status_resp.json()
+    result.setdefault("task_id", task_id)
+    result.setdefault("share_url", share_url)
+    last_result = result
     if result.get("status") in {"SUCCESS", "FAILURE"}:
         print(result)
         break
-    time.sleep(2)
+    time.sleep(5)
+else:
+    print(
+        {
+            "status": last_result.get("status", "RUNNING"),
+            "task_id": task_id,
+            "share_url": share_url,
+            "message": "Polling stopped after 28800 seconds. Check the share_url later for the completed result.",
+        }
+    )
 ```
 
 ## File upload rules
@@ -245,3 +260,4 @@ for _ in range(300):
 - Use Rosetta FastRelax before Rosetta SAP Score, FoldX, or Rosetta InterfaceAnalyzer when starting from a raw predicted structure.
 - Use Rosetta FastDesign only on a restricted residue set unless broad redesign is explicitly intended.
 - **Important**: When summarizing results to users, attach the `share_url` links of every successful task at the end so that users can view the online results of each invoked tool, rather than showing the file download links.
+- For long-running tasks without a fixed ETA, poll for no more than 28800 seconds; if the task is still running, stop polling and return the current `task_id` and `share_url` so the user can check later.

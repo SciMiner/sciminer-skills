@@ -115,9 +115,12 @@ resp = requests.post(
 )
 resp.raise_for_status()
 task_id = resp.json()["task_id"]
+share_url = f"https://sciminer.tech/share?id={task_id}&type=API_TOOL"
 
-# 4. Poll for result
-for _ in range(300):
+# 4. Poll for result for up to 6000 seconds, then return the URL for later follow-up
+deadline = time.time() + 6000
+last_result = {"status": "RUNNING", "task_id": task_id, "share_url": share_url}
+while time.time() < deadline:
     status_resp = requests.get(
         f"{BASE_URL}/v1/internal/tools/result",
         params={"task_id": task_id},
@@ -126,10 +129,22 @@ for _ in range(300):
     )
     status_resp.raise_for_status()
     result = status_resp.json()
+    result.setdefault("task_id", task_id)
+    result.setdefault("share_url", share_url)
+    last_result = result
     if result.get("status") in {"SUCCESS", "FAILURE"}:
         print(result)
         break
     time.sleep(2)
+else:
+    print(
+        {
+            "status": last_result.get("status", "RUNNING"),
+            "task_id": task_id,
+            "share_url": share_url,
+            "message": "Polling stopped after 6000 seconds. Check the share_url later for the completed result.",
+        }
+    )
 ```
 
 ## File upload rules
@@ -200,3 +215,4 @@ General:
 - Upload file inputs through `/v1/internal/tools/file` and pass returned `file_id` values.
 - `provider_name` must exactly match the values in `molecular-docking/scripts/sciminer_registry.py`.
 - Important: when summarizing results to users, attach the `share_url` links of every successful task at the end.
+- For long-running tasks without a fixed ETA, poll for no more than 6000 seconds; if the task is still running, stop polling and return the current `task_id` and `share_url` so the user can check later.
