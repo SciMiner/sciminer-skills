@@ -1,1 +1,0 @@
-"""Antibody engineering skill package."""
