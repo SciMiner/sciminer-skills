@@ -1,1 +1,0 @@
-"""synthesis-evaluation skill package."""
