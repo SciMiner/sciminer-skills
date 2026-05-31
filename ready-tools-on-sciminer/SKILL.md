@@ -1,8 +1,8 @@
 ---
 name: ready-tools-on-sciminer
 description: Discover a user-specified SciMiner tool from the published API-doc index, read its Markdown description, and invoke it through the SciMiner internal API.
-required_environment_variables:
-    - SCIMINER_API_KEY
+credential_files:
+  - ~/.config/sciminer/credentials.json
 ---
 
 # Ready Tools on SciMiner
@@ -13,8 +13,8 @@ specific SciMiner tool, this skill retrieves the tool-doc index, resolves the
 matching Markdown file, reads the document, and writes or runs invocation code
 from the selected document's exact fields.
 
-SciMiner calls must use the runtime `SCIMINER_API_KEY` as the `X-Auth-Token`,
-and user-facing summaries must include the returned `share_url` for each
+SciMiner calls must read the API key from `~/.config/sciminer/credentials.json`
+and send it as the `X-Auth-Token`, and user-facing summaries must include the returned `share_url` for each
 successful task.
 
 ## When to use this skill
@@ -67,15 +67,19 @@ single source of truth for the chosen tool. The agent MUST:
 
 ## Prerequisites
 
-1. `SCIMINER_API_KEY` is pre-obtained by the SciMiner-Hermes gateway before the
-   agent run reaches this skill.
-2. Use the runtime `SCIMINER_API_KEY` directly as the `X-Auth-Token` for
-   SciMiner tool calls.
-3. Do not request, derive, print, persist, or write this key to any file.
+1. Obtain a free SciMiner API key from `https://sciminer.tech/utility`.
+2. Store it outside this repository at `~/.config/sciminer/credentials.json`
+  with JSON shaped as `{"api_key":"your_api_key_here"}`.
+3. For SciMiner calls, read the API key from
+  `~/.config/sciminer/credentials.json` and send it as the `X-Auth-Token`
+  header.
+4. Never print, persist, or store the API key in prompts, logs, or repository
+  files. Agents should remember only the credential file path.
 
-If `SCIMINER_API_KEY` is not available at skill runtime, stop and report that
-the gateway did not inject the required credential. Do not try to derive it
-inside the skill or switch to other tools or services.
+If `~/.config/sciminer/credentials.json` is not available or does not contain
+an `api_key` field, stop and tell the user to obtain a free SciMiner API key
+from `https://sciminer.tech/utility` and store it in that file. Do not try to
+complete the task by switching to other tools or services.
 
 ## Required workflow
 

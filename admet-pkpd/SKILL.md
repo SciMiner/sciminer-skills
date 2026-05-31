@@ -1,8 +1,8 @@
 ---
 name: admet-pkpd
 description: ADMET and pharmacokinetic/pharmacodynamic property prediction workflows using ADMET Predictor, AOMP, OBA, Graph-pKa, DeepEsol, and Molecular Descriptors through SciMiner.
-required_environment_variables:
-    - SCIMINER_API_KEY
+credential_files:
+   - ~/.config/sciminer/credentials.json
 ---
 
 # ADMET & PKPD Skill
@@ -37,11 +37,12 @@ This skill groups property prediction workflows for assessing the pharmacokineti
 
 ## Prerequisites
 
-1. `SCIMINER_API_KEY` is pre-obtained by the SciMiner-Hermes gateway before the agent run reaches this skill.
-2. Use the runtime `SCIMINER_API_KEY` directly as the `X-Auth-Token` for SciMiner tool calls.
-3. Do not request, derive, print, persist, or write this key to any file.
+1. Obtain a free SciMiner API key from `https://sciminer.tech/utility`.
+2. Store it outside this repository at `~/.config/sciminer/credentials.json` with JSON shaped as `{"api_key":"your_api_key_here"}`.
+3. For SciMiner calls, read the API key from `~/.config/sciminer/credentials.json` and send it as the `X-Auth-Token` header.
+4. Never print, persist, or store the API key in prompts, logs, or repository files. Agents should remember only the credential file path.
 
-If `SCIMINER_API_KEY` is not available at skill runtime, stop and report that the gateway did not inject the required credential. Do not try to derive it inside the skill or switch to other tools or services.
+If `~/.config/sciminer/credentials.json` is not available or does not contain an `api_key` field, stop and tell the user to obtain a free SciMiner API key from `https://sciminer.tech/utility` and store it in that file. Do not try to complete the task by switching to other tools or services.
 
 ## Authoritative tool-doc source (required)
 
@@ -133,8 +134,8 @@ section, ask for correction or drop it with an explanation.
 - Use the selected Markdown doc under
    `https://sciminer.tech/tool_api_files/` as the authoritative source for
    payload construction and invoke-method details.
-- This skill requires the `SCIMINER_API_KEY` environment variable to be injected by the SciMiner-Hermes gateway before skill execution. The API key is sent as the `X-Auth-Token` header.
-- If `SCIMINER_API_KEY` is not available at skill runtime, stop and report that the gateway did not inject the required credential. Do not attempt to derive or locate the API key through other means.
+- Read the SciMiner API key from `~/.config/sciminer/credentials.json` and send it as the `X-Auth-Token` header. Do not print or persist the API key in prompts, logs, or repository files.
+- If `~/.config/sciminer/credentials.json` is missing or does not contain an `api_key` field, stop and tell the user to obtain a free SciMiner API key from `https://sciminer.tech/utility` and store it in that file.
 - `provider_name` must exactly match the selected Markdown doc.
 - The `features` parameter for ADMET Predictor is optional; omitting it returns all endpoints. Passing category letters (`A`, `D`, `M`, `E`, `T`) returns all endpoints within that category.
 - Use the selected Markdown doc to determine request encoding, file-upload
