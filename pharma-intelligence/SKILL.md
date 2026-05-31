@@ -22,20 +22,79 @@ Systematic, source-prioritized search and synthesis across regulatory, clinical,
 academic, and commercial databases — covering all major pharmaceutical markets
 and 14+ biomedical research databases.
 
+## Prerequisites
+
+1. Get a free SciMiner API key from `https://sciminer.tech/utility`
+2. Store the required credential in a persistent user-level config file that is outside this repository.
+3. Configure:
+
+```bash
+mkdir -p ~/.config/sciminer
+chmod 700 ~/.config/sciminer
+printf '{"api_key":"your_api_key_here"}\n' > ~/.config/sciminer/credentials.json
+chmod 600 ~/.config/sciminer/credentials.json
+```
+
+Agents should remember the credential file path, not the credential value. For persistent agent behavior across tasks, add an instruction to the relevant agent memory or project instruction file such as `CLAUDE.md`, `AGENTS.md`, or the Codex equivalent: "For SciMiner calls, read the API key from `~/.config/sciminer/credentials.json`; never print or store the API key in prompts, logs, or repository files."
+
+If `~/.config/sciminer/credentials.json` is not available or does not contain an `api_key` field, stop and tell the user to obtain a free SciMiner API key from `https://sciminer.tech/utility` and store it in that file. Do not try to complete the task by switching to other tools or services.
+
 ## MCP Server — How to Invoke
 
-There is no dedicated MCP tool in your toolbox. Call the unified endpoint over HTTP via `web_fetch` (POST) or `run_in_terminal` (curl):
+There is no dedicated MCP tool in your toolbox. Call the unified endpoint over HTTP, and authenticate every request with the `X-Auth-Token` header loaded from `~/.config/sciminer/credentials.json`:
 
 ```
 https://mcp.sciminer.tech/tools/unified/mcp
 ```
 
-Every call is a JSON-RPC POST. Always set `Content-Type: application/json` and `Accept: application/json`.
+Every call is a JSON-RPC POST. Always set `Content-Type: application/json`, `Accept: application/json`, and `X-Auth-Token`.
 
-```bash
-curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
-  -H "Content-Type: application/json" -H "Accept: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"ctg_search_studies","arguments":{"intervention":"pan-RAS","condition":"cancer","max_results":20}},"id":1}'
+```python
+import json
+from pathlib import Path
+import requests
+
+BASE_URL = "https://mcp.sciminer.tech/tools/unified/mcp"
+CREDENTIALS_PATH = Path.home() / ".config" / "sciminer" / "credentials.json"
+
+
+def load_api_key():
+    if not CREDENTIALS_PATH.exists():
+        raise FileNotFoundError(
+            f"SciMiner credentials file not found: {CREDENTIALS_PATH}. "
+            "Create it with an api_key field."
+        )
+    credentials = json.loads(CREDENTIALS_PATH.read_text())
+    api_key = credentials.get("api_key")
+    if not api_key:
+        raise ValueError(f"Missing api_key in {CREDENTIALS_PATH}")
+    return api_key
+
+
+resp = requests.post(
+    BASE_URL,
+    headers={
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "X-Auth-Token": load_api_key(),
+    },
+    json={
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+            "name": "ctg_search_studies",
+            "arguments": {
+                "intervention": "pan-RAS",
+                "condition": "cancer",
+                "max_results": 20,
+            },
+        },
+        "id": 1,
+    },
+    timeout=30,
+)
+resp.raise_for_status()
+print(resp.json())
 ```
 
 See [references/mcp-tools.md](./references/mcp-tools.md) for every tool's parameters and return shape.

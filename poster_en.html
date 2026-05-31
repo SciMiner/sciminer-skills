@@ -783,7 +783,7 @@
           <div class="stats" aria-label="Core statistics">
             <div class="stat"><b>10</b><span>installable skills for core drug discovery tasks</span></div>
             <div class="stat"><b>40+</b><span>SciMiner tool and model entry points</span></div>
-            <div class="stat"><b>1</b><span>shared credential: SCIMINER_API_KEY</span></div>
+            <div class="stat"><b>1</b><span>shared credential file: ~/.config/sciminer/credentials.json</span></div>
           </div>
           <a class="repo-link" href="https://github.com/SciMiner/sciminer-skills" target="_blank" rel="noopener">github.com/SciMiner/sciminer-skills</a>
         </div>
@@ -974,13 +974,13 @@
       <div class="page-inner">
         <div class="eyebrow">Install & Invoke</div>
         <h2>Unified Installation, Authentication, and Result Links</h2>
-        <p class="lead">OpenClaw can install from the skill marketplace or add this repository. Claude Code can install sciminer-skills on request. Every skill requires a SciMiner API key.</p>
+        <p class="lead">OpenClaw can install from the skill marketplace or add this repository. Claude Code can install sciminer-skills on request. All SciMiner skills read the API key from <code>~/.config/sciminer/credentials.json</code>.</p>
         <div class="grid two">
           <article class="card" style="--accent: var(--teal)">
             <span class="tag">Credential</span>
-            <h3>Environment Variable</h3>
-            <p>Get a free SciMiner API key, then set <strong>SCIMINER_API_KEY</strong>. Calls send it as the <strong>X-Auth-Token</strong> header.</p>
-            <div class="chips"><span class="chip">https://sciminer.tech/utility</span><span class="chip">SCIMINER_API_KEY</span></div>
+            <h3>Credential File</h3>
+            <p>Get a free SciMiner API key, then write it to the <strong>api_key</strong> field in <strong>~/.config/sciminer/credentials.json</strong>. Calls send it as the <strong>X-Auth-Token</strong> header; if the file or field is missing, stop and ask the user to configure it first.</p>
+            <div class="chips"><span class="chip">https://sciminer.tech/utility</span><span class="chip">~/.config/sciminer/credentials.json</span></div>
           </article>
           <article class="card" style="--accent: var(--blue)">
             <span class="tag">Result</span>
@@ -991,7 +991,8 @@
         </div>
         <div class="codebox" aria-label="SciMiner API invocation example">
           <pre><code>BASE_URL = "https://sciminer.tech/console/api"
-headers = {"X-Auth-Token": SCIMINER_API_KEY, "Content-Type": "application/json"}
+CREDENTIALS_PATH = Path.home() / ".config" / "sciminer" / "credentials.json"
+headers = {"X-Auth-Token": load_api_key(CREDENTIALS_PATH), "Content-Type": "application/json"}
 
 payload = {
     "provider_name": "PocketXMol",
