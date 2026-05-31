@@ -1,1 +1,0 @@
-"""OCSR skill package."""

@@ -1,26 +1,58 @@
-SciMiner Skills
+# SciMiner Skills
 
-A concise collection of skill definitions built on top of the SciMiner API.
+Simplified Chinese: [README.zh-CN.md](./README.zh-CN.md)
 
-Installation
-- OpenClaw: install from the OpenClaw skill marketplace or add this repository.
-- Claude Code: in a Claude Code conversation, request installation of "sciminer-skills", or install directly via ClawHub (links are listed with each skill below).
+This repository collects reusable agent skills for SciMiner-driven scientific
+workflows. Each skill lives in its own directory and is packaged as a
+`SKILL.md` file that tells an agent when to use the skill, how to choose the
+right method, and how to invoke the underlying tools or services.
 
-Usage
-- Each skill folder contains a SKILL.md with usage details (admet-pkpd, peptide-design, protein-design, structure-prediction).
+The current skill set covers:
 
-Skills
-- `admet-pkpd`: Pan-ADMET small-molecule property prediction workflows (ADMET, solvation energy, pKa, oral bioavailability, cocrystal, AOX metabolism, molecular descriptors). Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/sciminer/admet-pkpd
-- `peptide-design`: Peptide generation and analysis (pocket-guided docking, macrocyclic peptide design, peptide descriptors, extinction coefficient, pI, liabilities). Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/xiongzhp/peptide-design
-- `protein-design`: BoltzGen protein/peptide/antibody/nanobody design (de novo and targeted designs; supports file uploads for targets and frameworks). Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/xiongzhp/protein-design
-- `structure-prediction`: Biomolecular structure prediction using Chai-1, Boltz-2, and Alphafold3 for proteins, nucleic acids, ligands, and complexes. Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/xiongzhp/structure-prediction
-- `virtual-screening`: Virtual screening workflows for small molecules and fragment libraries (docking, scoring, library enumeration, high-throughput screening). Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/sciminer/virtual-screening
-- `small-molecule-design`: Small-molecule generative and optimization workflows (de novo design, lead optimization, property-constrained generation). Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/sciminer/small-molecule-design
-- `synthesis-evaluation`: Synthesis planning and evaluation tools (retrosynthesis suggestions, route scoring, feasibility and building-block analysis). Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/sciminer/synthesis-evaluation
-- `optical-chemical-structure-recognition`: Optical chemical structure recognition (image-to-structure OCR, extract structures from figures or PDFs, image-to-SMILES conversion and parsing). Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/sciminer/optical-chemical-structure-recognition
-- `binding-site-prediction`: Binding-site and pocket prediction workflows using P2Rank, AF2BIND, and fpocket (ML-based ranking, geometry-based detection, and per-residue binding probability scoring). Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/sciminer/binding-site-prediction
-- `pharma-intelligence`: Global pharmaceutical intelligence and biomedical research workflows (regulatory status, clinical trials, safety, patents, competitive landscape, literature, and target discovery across major regions). ClawHub: https://clawhub.ai/sciminer/pharma-intelligence
-- `antibody-engineering`: End-to-end antibody engineering combining ANARCI, BioPhi, IgFold, FoldX, and Rosetta (sequence numbering, humanization, structure prediction, developability profiling, affinity maturation, and precision redesign). Requires `SCIMINER_API_KEY`. ClawHub: https://clawhub.ai/sciminer/antibody-engineering
+- ADMET and PK/PD prediction
+- antibody engineering
+- binding-site prediction
+- molecular docking
+- optical chemical structure recognition
+- peptide design
+- global pharma intelligence and biomedical research
+- protein design
+- general SciMiner tool discovery and invocation
+- small-molecule design
+- structure prediction
+- retrosynthesis and synthesis evaluation
+- virtual screening
 
-Notes
-- These skills rely on the SciMiner API and require an API key, which you can obtain for free at https://sciminer.tech/utility and paste into the input box of OpenClaw or Claude code when prompted.
+## Install with an agent
+
+If your coding or research agent supports skill installation from a repository
+or hub link, you can ask it to install these skills directly by providing one
+of these links:
+
+- GitHub: https://github.com/SciMiner/sciminer-skills
+- Clawhub: https://clawhub.ai/user/sciminer
+
+Example prompts:
+
+- `Install the SciMiner skills from https://github.com/SciMiner/sciminer-skills`
+- `Install the SciMiner skills from https://clawhub.ai/user/sciminer`
+
+In most agent environments, this is enough for automatic installation. No
+manual copying is required if the agent already supports repository- or
+hub-based skill import.
+
+## Repository layout
+
+- Each top-level directory is a standalone skill.
+- Most skills describe SciMiner-backed workflows and point the agent to the
+  authoritative API docs under `https://sciminer.tech/tool_api_files/`.
+- `pharma-intelligence/` also includes reference material for regulatory,
+  clinical, and literature search workflows.
+- `ready-tools-on-sciminer/` is the generic fallback for discovering and using
+  published SciMiner tools that are not covered by a more specific skill.
+
+## Notes
+
+Many SciMiner execution skills expect an API key in
+`~/.config/sciminer/credentials.json`. See the individual `SKILL.md` files for
+workflow-specific requirements, supported tools, and invocation details.

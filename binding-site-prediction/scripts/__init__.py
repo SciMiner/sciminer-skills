@@ -1,1 +1,0 @@
-"""Binding-site prediction skill package."""
