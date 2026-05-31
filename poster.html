@@ -900,10 +900,17 @@
           <pre><code>import json
 from pathlib import Path
 
+def load_api_key():
+    credentials_path = Path.home() / ".config" / "sciminer" / "credentials.json"
+    if not credentials_path.exists():
+        raise FileNotFoundError(f"Create {credentials_path} with an api_key field.")
+    api_key = json.loads(credentials_path.read_text()).get("api_key")
+    if not api_key:
+        raise ValueError(f"Missing api_key in {credentials_path}")
+    return api_key
+
 BASE_URL = "https://sciminer.tech/console/api"
-CREDENTIALS_PATH = Path.home() / ".config" / "sciminer" / "credentials.json"
-API_KEY = json.loads(CREDENTIALS_PATH.read_text())["api_key"]
-headers = {"X-Auth-Token": API_KEY, "Content-Type": "application/json"}
+headers = {"X-Auth-Token": load_api_key(), "Content-Type": "application/json"}
 
 payload = {
     "provider_name": "PocketXMol",
