@@ -903,7 +903,9 @@ from pathlib import Path
 def load_api_key():
     credentials_path = Path.home() / ".config" / "sciminer" / "credentials.json"
     if not credentials_path.exists():
-        raise FileNotFoundError(f"Create {credentials_path} with an api_key field.")
+        raise FileNotFoundError(
+            f'Create {credentials_path} with JSON like {{"api_key":"your_api_key_here"}}.'
+        )
     api_key = json.loads(credentials_path.read_text()).get("api_key")
     if not api_key:
         raise ValueError(f"Missing api_key in {credentials_path}")

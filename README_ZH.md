@@ -20,6 +20,7 @@ printf '{"api_key":"your_api_key_here"}\n' > ~/.config/sciminer/credentials.json
 chmod 600 ~/.config/sciminer/credentials.json
 ```
 
+- 如果 API key 中包含引号、反斜杠或其他 JSON 特殊字符，请使用支持 JSON 的编辑器或脚本写入文件，确保 `api_key` 的值被正确转义。
 - Agent 应记住凭证文件路径，而不是凭证值：调用 SciMiner 时，从 `~/.config/sciminer/credentials.json` 读取 API key；不要在 prompt、日志或仓库文件中打印或存储 API key。
 - 如果 `~/.config/sciminer/credentials.json` 不存在，或其中没有 `api_key` 字段，应停止并提示用户从 https://sciminer.tech/utility 获取免费 API key 并写入该文件。不要改用其他工具或服务来继续任务。
 

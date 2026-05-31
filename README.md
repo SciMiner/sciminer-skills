@@ -20,6 +20,7 @@ printf '{"api_key":"your_api_key_here"}\n' > ~/.config/sciminer/credentials.json
 chmod 600 ~/.config/sciminer/credentials.json
 ```
 
+- If the API key contains quotes, backslashes, or other JSON-special characters, write the file with a JSON-aware editor or script so the `api_key` value is escaped correctly.
 - Agents should remember the credential file path, not the credential value: for SciMiner calls, read the API key from `~/.config/sciminer/credentials.json`; never print or store the API key in prompts, logs, or repository files.
 - If `~/.config/sciminer/credentials.json` is missing or does not contain an `api_key` field, stop and tell the user to obtain a free SciMiner API key from https://sciminer.tech/utility and store it in that file. Do not switch to other tools or services.
 

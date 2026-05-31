@@ -35,6 +35,8 @@ printf '{"api_key":"your_api_key_here"}\n' > ~/.config/sciminer/credentials.json
 chmod 600 ~/.config/sciminer/credentials.json
 ```
 
+If the API key contains quotes, backslashes, or other JSON-special characters, write the file with a JSON-aware editor or script so the `api_key` value is escaped correctly.
+
 Agents should remember the credential file path, not the credential value. For persistent agent behavior across tasks, add an instruction to the relevant agent memory or project instruction file such as `CLAUDE.md`, `AGENTS.md`, or the Codex equivalent: "For SciMiner calls, read the API key from `~/.config/sciminer/credentials.json`; never print or store the API key in prompts, logs, or repository files."
 
 If `~/.config/sciminer/credentials.json` is not available or does not contain an `api_key` field, stop and tell the user to obtain a free SciMiner API key from `https://sciminer.tech/utility` and store it in that file. Do not try to complete the task by switching to other tools or services.
@@ -62,7 +64,7 @@ def load_api_key():
     if not CREDENTIALS_PATH.exists():
         raise FileNotFoundError(
             f"SciMiner credentials file not found: {CREDENTIALS_PATH}. "
-            "Create it with an api_key field."
+            'Create it with JSON like {"api_key":"your_api_key_here"}.'
         )
     credentials = json.loads(CREDENTIALS_PATH.read_text())
     api_key = credentials.get("api_key")
