@@ -8,20 +8,21 @@
 ## Step 1: Identify the Drug
 
 ```bash
-curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
-  -H "Content-Type: application/json" -H "Accept: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"chembl_search_molecules","arguments":{"query":"osimertinib","max_results":5}},"id":1}'
+# chembl-skill — molecule search
+cd skills/chembl-skill
+echo '{"base_url":"https://www.ebi.ac.uk/chembl/api/data","path":"molecule/search.json","params":{"q":"osimertinib","limit":5},"record_path":"molecules","max_items":5}' \
+  | python scripts/rest_request.py
 ```
 
 Note the ChEMBL ID (e.g., `CHEMBL3353410`) and max phase. Then get full details:
 
 ```bash
-curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
-  -H "Content-Type: application/json" -H "Accept: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"chembl_get_molecule","arguments":{"molecule_id":"CHEMBL3353410"}},"id":2}'
+# chembl-skill — full molecule record
+echo '{"base_url":"https://www.ebi.ac.uk/chembl/api/data","path":"molecule/CHEMBL3353410.json"}' \
+  | python scripts/rest_request.py
 ```
 
-Returns: ATC codes, approved indications, mechanism, black box warnings.
+Returns: SMILES, ATC codes, max phase, indications, black box warning flag.
 
 ---
 
@@ -29,38 +30,40 @@ Returns: ATC codes, approved indications, mechanism, black box warnings.
 
 ### FDA label (approved indications + label date)
 ```bash
-curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
-  -H "Content-Type: application/json" -H "Accept: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"openfda_search_drug_labels","arguments":{"drug_name":"osimertinib","section":"indications_and_usage"}},"id":3}'
+# web_fetch — openFDA drug label
+web_fetch 'https://api.fda.gov/drug/label.json?search=openfda.generic_name:osimertinib&limit=1'
 ```
 
 ### Orphan designation (if applicable)
 ```bash
-curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
-  -H "Content-Type: application/json" -H "Accept: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"fda_orphan_search_designations","arguments":{"drug_name":"osimertinib","max_results":5}},"id":4}'
+# web_fetch — FDA Orphan Drug Product Designation Database
+web_fetch 'https://www.accessdata.fda.gov/scripts/opdlisting/oopd/listResult.cfm?Search_Term=osimertinib'
 ```
 
-### Orange Book / exclusivity → use web_search for:
-> `site:accessdata.fda.gov/scripts/cder/ob osimertinib`
+### Orange Book / exclusivity
+```bash
+# web_fetch — Orange Book
+web_fetch 'https://www.accessdata.fda.gov/scripts/cder/ob/results_product.cfm?Appl_Type=N&Appl_No=208065'
+```
 
 ---
 
 ## Step 3: US Clinical Trials (Phase 3 + Active)
 
-> **Scope:** `ctg_search_studies` queries ClinicalTrials.gov, which is **US-only**. For CN/EU/JP/KR/AU trials, run the regional `web_fetch` calls in Step 9 in parallel.
+> **Scope:** `clinicaltrials-skill` queries ClinicalTrials.gov, which is **US-only**. For CN/EU/JP/KR/AU trials, run the regional `web_fetch` calls in Step 9 in parallel.
 
 ```bash
-curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
-  -H "Content-Type: application/json" -H "Accept: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"ctg_search_studies","arguments":{"condition":"non-small cell lung cancer","intervention":"osimertinib","phase":"PHASE3","max_results":20}},"id":5}'
+# clinicaltrials-skill — Phase 3 study search
+cd skills/clinicaltrials-skill
+echo '{"action":"studies","params":{"query.cond":"non-small cell lung cancer","query.intr":"osimertinib","filter.phase":"PHASE3","pageSize":20},"max_items":20,"max_pages":1}' \
+  | python scripts/clinicaltrials_client.py
 ```
 
-Get full protocol for key trials:
+Get full protocol for a key trial:
 ```bash
-curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
-  -H "Content-Type: application/json" -H "Accept: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"ctg_get_study","arguments":{"nct_id":"NCT02151981"}},"id":6}'
+# clinicaltrials-skill — single trial by NCT ID
+echo '{"action":"studies","params":{"query.id":"NCT02151981","pageSize":1},"max_items":1}' \
+  | python scripts/clinicaltrials_client.py
 ```
 
 ---
@@ -68,9 +71,8 @@ curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
 ## Step 4: Safety Profile (FAERS)
 
 ```bash
-curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
-  -H "Content-Type: application/json" -H "Accept: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"openfda_search_adverse_events","arguments":{"drug_name":"osimertinib","seriousness":"serious","limit":50}},"id":7}'
+# web_fetch — openFDA adverse events
+web_fetch 'https://api.fda.gov/drug/event.json?search=patient.drug.openfda.generic_name:osimertinib+AND+serious:1&limit=50'
 ```
 
 ---
@@ -83,12 +85,13 @@ Global patent search uses free web sources (no API key):
 - WIPO PATENTSCOPE: `web_fetch https://patentscope.wipo.int/search/en/result.jsf?query=osimertinib`
 - Espacenet (EPO): `web_fetch https://worldwide.espacenet.com/patent/search?q=osimertinib` (use the "INPADOC patent family" view for cross-jurisdiction equivalents)
 
-Structured US patents via MCP:
+Structured US patent search:
 
 ```bash
-curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
-  -H "Content-Type: application/json" -H "Accept: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"uspto_ppubs_search_patents","arguments":{"query":"osimertinib EGFR inhibitor","max_results":20}},"id":8}'
+# web_fetch — USPTO patent search (no sub-skill)
+web_fetch 'https://ppubs.uspto.gov/dirsearch-public/print/downloadPdf/osimertinib'
+# Or via Google Patents (easier full-text search)
+web_fetch 'https://patents.google.com/?q=osimertinib+EGFR+T790M&assignee=AstraZeneca'
 ```
 
 For Orange Book expiry: `web_fetch https://www.accessdata.fda.gov/scripts/cder/ob`.
@@ -99,23 +102,24 @@ For Orange Book expiry: `web_fetch https://www.accessdata.fda.gov/scripts/cder/o
 
 ### All drugs approved/investigated for NSCLC
 ```bash
-curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
-  -H "Content-Type: application/json" -H "Accept: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"chembl_find_drugs_by_indication","arguments":{"indication":"non-small cell lung cancer","max_results":50}},"id":10}'
+# chembl-skill — drug indications by EFO term
+cd skills/chembl-skill
+echo '{"base_url":"https://www.ebi.ac.uk/chembl/api/data","path":"drug_indication.json","params":{"efo_term":"non-small cell lung carcinoma","limit":20},"record_path":"drug_indications","max_items":50}' \
+  | python scripts/rest_request.py
 ```
 
 ### All active NSCLC trials (any intervention)
 ```bash
-curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
-  -H "Content-Type: application/json" -H "Accept: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"ctg_search_studies","arguments":{"condition":"non-small cell lung cancer","recruitment_status":"RECRUITING","phase":"PHASE3","max_results":30}},"id":11}'
+# clinicaltrials-skill — recruiting Phase 3 trials
+cd skills/clinicaltrials-skill
+echo '{"action":"studies","params":{"query.cond":"non-small cell lung cancer","filter.overallStatus":"RECRUITING","filter.phase":"PHASE3","pageSize":30},"max_items":30,"max_pages":1}' \
+  | python scripts/clinicaltrials_client.py
 ```
 
 ### Competitor SEC pipeline disclosures
 ```bash
-curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
-  -H "Content-Type: application/json" -H "Accept: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"edgar_fulltext_search","arguments":{"query":"EGFR inhibitor NSCLC pipeline 2025","max_results":10}},"id":12}'
+# web_fetch — EDGAR full-text search (no sub-skill)
+web_fetch 'https://efts.sec.gov/LATEST/search-index?q=%22EGFR+inhibitor%22+%22NSCLC%22+%22pipeline%22&dateRange=custom&startdt=2025-01-01&forms=10-K,10-Q'
 ```
 
 ---
@@ -124,29 +128,32 @@ curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
 
 ### Get EGFR gene info and cross-references
 ```bash
-curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
-  -H "Content-Type: application/json" -H "Accept: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"mygene_search_genes","arguments":{"query":"EGFR","max_results":3}},"id":13}'
+# ncbi-clinicaltables-skill or ensembl-skill
+cd skills/ensembl-skill
+echo '{"base_url":"https://rest.ensembl.org","path":"lookup/symbol/homo_sapiens/EGFR","params":{"content-type":"application/json","expand":1}}' \
+  | python scripts/rest_request.py
 ```
 
 ### Find all drugs targeting EGFR
 ```bash
-curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
-  -H "Content-Type: application/json" -H "Accept: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"chembl_find_drugs_by_target","arguments":{"target_name":"EGFR","include_all_mechanisms":true,"max_results":30}},"id":14}'
+# chembl-skill — target search then mechanism lookup
+cd skills/chembl-skill
+echo '{"base_url":"https://www.ebi.ac.uk/chembl/api/data","path":"target/search.json","params":{"q":"EGFR","limit":5},"record_path":"targets","max_items":5}' \
+  | python scripts/rest_request.py
+# Then use the target ChEMBL ID from above:
+echo '{"base_url":"https://www.ebi.ac.uk/chembl/api/data","path":"mechanism.json","params":{"target_chembl_id":"CHEMBL203","limit":20},"record_path":"mechanisms","max_items":30}' \
+  | python scripts/rest_request.py
 ```
 
-### OpenTargets: NSCLC targets ranked by evidence
+### Open Targets: NSCLC targets ranked by evidence
 ```bash
-# First get disease ID
-curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
-  -H "Content-Type: application/json" -H "Accept: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"opentargets_search","arguments":{"query":"non-small cell lung cancer","entity_type":"disease"}},"id":15}'
-
-# Then get top targets (use MONDO ID from above)
-curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
-  -H "Content-Type: application/json" -H "Accept: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"opentargets_get_associations","arguments":{"disease_id":"MONDO_0005233","size":20}},"id":16}'
+# opentargets-skill — disease search then associated targets
+cd skills/opentargets-skill
+echo '{"query":"query SearchDisease($q:String!){search(queryString:$q,entityNames:[\\"disease\\"]){hits{entity score object{...on Disease{id name}}}}}","variables":{"q":"non-small cell lung cancer"},"max_items":5}' \
+  | python scripts/opentargets_graphql.py
+# Then use the EFO ID from above (e.g., EFO_0003060):
+echo '{"query":"query AssocTargets($id:String!,$size:Int){disease(efoId:$id){associatedTargets(page:{size:$size}){rows{target{id approvedSymbol} score}}}}","variables":{"id":"EFO_0003060","size":20},"max_items":20}' \
+  | python scripts/opentargets_graphql.py
 ```
 
 ---
@@ -154,16 +161,18 @@ curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
 ## Step 8: Literature Review
 
 ```bash
-curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
-  -H "Content-Type: application/json" -H "Accept: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"pubmed_search_articles","arguments":{"query":"osimertinib resistance mechanisms 2024 2025","chemicals":["osimertinib"],"diseases":["non-small cell lung cancer"],"max_results":30}},"id":17}'
+# ncbi-entrez-skill — PubMed search
+cd skills/ncbi-entrez-skill
+echo '{"endpoint":"esearch","params":{"db":"pubmed","term":"osimertinib[tiab] AND (resistance[tiab] OR mechanism[tiab]) AND (\"non-small cell lung cancer\"[MeSH] OR NSCLC[tiab]) AND 2024:2025[dp]","retmode":"json","retmax":20},"max_items":20}' \
+  | python scripts/ncbi_entrez.py
 ```
 
 For preprints (ahead of peer review):
 ```bash
-curl -X POST https://mcp.sciminer.tech/tools/unified/mcp \
-  -H "Content-Type: application/json" -H "Accept: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"europepmc_search_preprints","arguments":{"query":"osimertinib EGFR 2025","max_results":10}},"id":18}'
+# biorxiv-skill — medRxiv preprints
+cd skills/biorxiv-skill
+echo '{"base_url":"https://api.biorxiv.org","path":"details/medrxiv/2025-01-01/2025-06-09/0/json","record_path":"collection","max_items":10}' \
+  | python scripts/rest_request.py
 ```
 
 ---
@@ -218,6 +227,6 @@ After running the above steps, structure the output as:
 ### Sources Used (with Tier)
 - Tier 1: FDA label (Drugs@FDA, accessed YYYY-MM-DD)
 - Tier 1: NMPA approval (nmpa.gov.cn, accessed YYYY-MM-DD)
-- Tier 2: ClinicalTrials.gov (ctg_search_studies, accessed YYYY-MM-DD)
-- Tier 3: PubMed (pubmed_search_articles, accessed YYYY-MM-DD)
+- Tier 2: ClinicalTrials.gov (clinicaltrials-skill, accessed YYYY-MM-DD)
+- Tier 3: PubMed (ncbi-entrez-skill, accessed YYYY-MM-DD)
 ```
