@@ -44,7 +44,7 @@ English: [README.md](./README.md)
 
 - 每个顶层目录对应一个独立 skill。
 - 大多数 skills 描述的是基于 SciMiner 的工作流，并会引导 agent 使用
-  `https://sciminer.tech/tool_api_files/` 下的权威 API 文档。
+  `https://sciminer.simm.ac.cn/tool_api_files/` 下的权威 API 文档。
 - `pharma-intelligence/` 额外包含监管、临床和文献检索相关的参考资料。
 - `ready-tools-on-sciminer/` 是一个通用兜底 skill，用于发现和调用那些尚未
   被更具体 skill 覆盖的已发布 SciMiner 工具。

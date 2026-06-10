@@ -45,7 +45,7 @@ hub-based skill import.
 
 - Each top-level directory is a standalone skill.
 - Most skills describe SciMiner-backed workflows and point the agent to the
-  authoritative API docs under `https://sciminer.tech/tool_api_files/`.
+  authoritative API docs under `https://sciminer.simm.ac.cn/tool_api_files/`.
 - `pharma-intelligence/` also includes reference material for regulatory,
   clinical, and literature search workflows.
 - `ready-tools-on-sciminer/` is the generic fallback for discovering and using

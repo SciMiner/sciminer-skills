@@ -41,16 +41,16 @@ Docking engines:
 
 ## Prerequisites
 
-1. Obtain a free SciMiner API key from `https://sciminer.tech/utility`.
+1. Obtain a free SciMiner API key from `https://sciminer.simm.ac.cn/utility`.
 2. Store it outside this repository at `~/.config/sciminer/credentials.json` with JSON shaped as `{"api_key":"your_api_key_here"}`.
 3. For SciMiner calls, read the API key from `~/.config/sciminer/credentials.json` and send it as the `X-Auth-Token` header.
 4. Never print, persist, or store the API key in prompts, logs, or repository files. Agents should remember only the credential file path.
 
-If `~/.config/sciminer/credentials.json` is not available or does not contain an `api_key` field, stop and tell the user to obtain a free SciMiner API key from `https://sciminer.tech/utility` and store it in that file. Do not try to complete the task by switching to other tools or services.
+If `~/.config/sciminer/credentials.json` is not available or does not contain an `api_key` field, stop and tell the user to obtain a free SciMiner API key from `https://sciminer.simm.ac.cn/utility` and store it in that file. Do not try to complete the task by switching to other tools or services.
 
 ## Authoritative tool-doc source (required)
 
-The published Markdown files under `https://sciminer.tech/tool_api_files/` are the single source of truth for the selected docking tool's `provider_name`, `tool_name`, allowed `parameters`, file-upload behavior, request encoding, and submission flow.
+The published Markdown files under `https://sciminer.simm.ac.cn/tool_api_files/` are the single source of truth for the selected docking tool's `provider_name`, `tool_name`, allowed `parameters`, file-upload behavior, request encoding, and submission flow.
 
 The agent MUST:
 
@@ -77,7 +77,7 @@ section, ask for correction or drop it with an explanation.
 2. When no pocket input is available, run the supporting pocket-detection step
    first and then read the corresponding docking tool docs.
 3. Read the selected tool Markdown file or files from
-   `https://sciminer.tech/tool_api_files/`.
+   `https://sciminer.simm.ac.cn/tool_api_files/`.
 4. Choose the doc section that matches the user's input shape.
 5. Collect any missing required parameters from the user.
 6. Upload required file inputs exactly as described by the selected Markdown
@@ -104,7 +104,7 @@ section, ask for correction or drop it with an explanation.
     "status": "SUCCESS",
     "result": {...},
     "task_id": "xxx",
-    "share_url": "https://sciminer.tech/share?id=<task_id>&type=API_TOOL"
+    "share_url": "https://sciminer.simm.ac.cn/share?id=<task_id>&type=API_TOOL"
 }
 ```
 
@@ -118,10 +118,10 @@ section, ask for correction or drop it with an explanation.
 ## Notes
 
 - Use the selected Markdown doc under
-    `https://sciminer.tech/tool_api_files/` as the authoritative source for
+    `https://sciminer.simm.ac.cn/tool_api_files/` as the authoritative source for
     payload construction and invoke-method details.
 - Read the SciMiner API key from `~/.config/sciminer/credentials.json` and send it as the `X-Auth-Token` header. Do not print or persist the API key in prompts, logs, or repository files.
-- If `~/.config/sciminer/credentials.json` is missing or does not contain an `api_key` field, stop and tell the user to obtain a free SciMiner API key from `https://sciminer.tech/utility` and store it in that file.
+- If `~/.config/sciminer/credentials.json` is missing or does not contain an `api_key` field, stop and tell the user to obtain a free SciMiner API key from `https://sciminer.simm.ac.cn/utility` and store it in that file.
 - `provider_name` must exactly match the selected Markdown doc.
 - Use the selected Markdown doc to determine file inputs, parameter placement,
     and any tool-specific submission details.

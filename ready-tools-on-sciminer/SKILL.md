@@ -8,7 +8,7 @@ credential_files:
 # Ready Tools on SciMiner
 
 This skill handles arbitrary SciMiner tools whose API descriptions are published
-under `https://sciminer.tech/tool_api_files/`. When a user asks to use a
+under `https://sciminer.simm.ac.cn/tool_api_files/`. When a user asks to use a
 specific SciMiner tool, this skill retrieves the tool-doc index, resolves the
 matching Markdown file, reads the document, and writes or runs invocation code
 from the selected document's exact fields.
@@ -27,7 +27,7 @@ successful task.
 
 ## Tool discovery rule
 
-- Start from `https://sciminer.tech/tool_api_files/`.
+- Start from `https://sciminer.simm.ac.cn/tool_api_files/`.
 - Treat the index page as the source of available SciMiner tool docs.
 - Prefer exact, case-insensitive matching between the requested tool name and
   the linked file stem before `_api_doc.md`.
@@ -45,7 +45,7 @@ Examples:
 
 ## Authoritative payload source
 
-The selected Markdown file under `https://sciminer.tech/tool_api_files/` is the
+The selected Markdown file under `https://sciminer.simm.ac.cn/tool_api_files/` is the
 single source of truth for the chosen tool. The agent MUST:
 
 1. Read the selected tool doc before every invocation.
@@ -67,7 +67,7 @@ single source of truth for the chosen tool. The agent MUST:
 
 ## Prerequisites
 
-1. Obtain a free SciMiner API key from `https://sciminer.tech/utility`.
+1. Obtain a free SciMiner API key from `https://sciminer.simm.ac.cn/utility`.
 2. Store it outside this repository at `~/.config/sciminer/credentials.json`
   with JSON shaped as `{"api_key":"your_api_key_here"}`.
 3. For SciMiner calls, read the API key from
@@ -78,12 +78,12 @@ single source of truth for the chosen tool. The agent MUST:
 
 If `~/.config/sciminer/credentials.json` is not available or does not contain
 an `api_key` field, stop and tell the user to obtain a free SciMiner API key
-from `https://sciminer.tech/utility` and store it in that file. Do not try to
+from `https://sciminer.simm.ac.cn/utility` and store it in that file. Do not try to
 complete the task by switching to other tools or services.
 
 ## Required workflow
 
-1. Read the index at `https://sciminer.tech/tool_api_files/`.
+1. Read the index at `https://sciminer.simm.ac.cn/tool_api_files/`.
 2. Resolve the Markdown description file for the requested tool from the links
    actually present in the index.
 3. Read the full Markdown document for the resolved tool.
@@ -118,13 +118,13 @@ Do not apply a shared invocation template in this skill.
   "status": "SUCCESS",
   "result": {"...": "..."},
   "task_id": "xxx",
-  "share_url": "https://sciminer.tech/share?id=xxx&type=API_TOOL"
+  "share_url": "https://sciminer.simm.ac.cn/share?id=xxx&type=API_TOOL"
 }
 ```
 
 ## Reporting rules
 
-- Cite the selected Markdown doc under `https://sciminer.tech/tool_api_files/`
+- Cite the selected Markdown doc under `https://sciminer.simm.ac.cn/tool_api_files/`
   as the payload source in your summary.
 - Attach the `share_url` of every successful task at the end of the response so
   the user can view the online result.
