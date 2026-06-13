@@ -11,6 +11,7 @@ English: [README.md](./README.md)
 - ADMET 与 PK/PD 预测
 - 抗体工程
 - 结合位点预测
+- FEP-alternative 相对结合自由能与活性预测
 - 分子对接
 - 光学化学结构识别
 - 肽设计

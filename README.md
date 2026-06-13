@@ -12,6 +12,7 @@ The current skill set covers:
 - ADMET and PK/PD prediction
 - antibody engineering
 - binding-site prediction
+- FEP-alternative relative binding free-energy and activity prediction
 - molecular docking
 - optical chemical structure recognition
 - peptide design
