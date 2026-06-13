@@ -1,5 +1,5 @@
 ---
-name: FEP-alternative
+name: fep-alternative
 description: Relative binding free-energy and activity-label prediction workflows using PBCNet 2.0 on SciMiner, with Gnina docking and PDB/database retrieval to complete missing inputs.
 credential_files:
    - ~/.config/sciminer/credentials.json
