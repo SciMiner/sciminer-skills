@@ -75,11 +75,6 @@ binding poses.
 3. Do not request, derive, print, persist, or write this key to any file.
 4. If `SCIMINER_API_KEY` is not available at skill runtime, stop and report that the gateway did not inject the required credential. Do not try to derive it inside the skill or switch to other tools or services.
 
-If `~/.config/sciminer/credentials.json` is not available or does not contain
-an `api_key` field, stop and tell the user to obtain a free SciMiner API key
-from `https://sciminer.simm.ac.cn/utility` and store it in that file. Do not try to
-complete the task by switching to other tools or services.
-
 ## Authoritative tool-doc source (required)
 
 The published Markdown files under `https://sciminer.simm.ac.cn/tool_api_files/` are
@@ -237,12 +232,18 @@ section, ask for correction or drop it with an explanation.
 - Use the selected SciMiner Markdown docs under
   `https://sciminer.simm.ac.cn/tool_api_files/` as the authoritative source for
   payload construction and invoke-method details.
+<<<<<<< HEAD
 - Read the SciMiner API key from `~/.config/sciminer/credentials.json` and send
   it as the `X-Auth-Token` header. Do not print or persist the API key in
   prompts, logs, or repository files.
 - If `~/.config/sciminer/credentials.json` is missing or does not contain an
   `api_key` field, stop and tell the user to obtain a free SciMiner API key
   from `https://sciminer.simm.ac.cn/utility` and store it in that file.
+=======
+- Use the runtime `SCIMINER_API_KEY` directly as the `X-Auth-Token` header for
+  SciMiner calls. Do not request, derive, print, persist, or write this key to
+  any file.
+>>>>>>> 5ddcf28 (fix error)
 - `provider_name` and `tool_name` must exactly match the selected Markdown doc.
 - Use the selected Markdown doc to determine PBCNet `label_list` formatting,
   Gnina pocket specification, file inputs, parameter placement, and any
