@@ -1,6 +1,6 @@
 ---
 name: virtual-screening
-description: Virtual screening workflows combining protein-sequence lookup, docking box calculation, transformer-based library screening, and docking-based proprietary library screening through SciMiner.
+description: Virtual screening workflows for open and proprietary chemical libraries, including transformer-based screening and docking-based screening through SciMiner.
 required_environment_variables:
     - SCIMINER_API_KEY
 ---
@@ -9,25 +9,22 @@ required_environment_variables:
 
 This skill groups end-to-end virtual screening workflows, including:
 
-- protein sequence retrieval from UniProt
-- docking box calculation from natural-language binding site descriptions
 - transformer-based proprietary library virtual screening
 - docking-based proprietary library virtual screening
+- transformer-based open library virtual screening
+- docking-based open library virtual screening
 
 ## When to use this skill
 
-- Screen proprietary or commercial small-molecule libraries against a protein target
-- Start from a protein sequence and rank likely binders with TransformerCPI-style screening
+- Screen proprietary or open chemical libraries against a protein target
+- Start from a protein sequence and rank likely binders with transformer-based screening
 - Start from a receptor structure and run docking-based screening with explicit docking box setup
-- Calculate a docking box from a PDB file or natural-language binding-site description before screening
-- Retrieve a protein sequence from UniProt when only gene or target identity is known
 
 ## Method selection rule
 
-- If a protein structure file or PDB ID is provided, use `Docking-Based Proprietary Library Virtual Screen`.
-- In that case, use `Get Box` first to obtain the docking box before running docking-based screening.
-- If no protein structure file or PDB ID is provided, use `Transformer-Based Proprietary Library Virtual Screen`.
-- In that case, use `Get Protein Sequence` first when the protein sequence is not already available.
+- If a protein structure file or PDB ID is provided, use `Docking-Based Open Library Virtual Screen`.
+- If no protein structure file or PDB ID is provided, use `Transformer-Based Open Library Virtual Screen`.
+- If you need the legacy proprietary screening paths, use `Docking-Based Proprietary Library Virtual Screen` or `Transformer-Based Proprietary Library Virtual Screen`.
 
 ## Prerequisites
 
@@ -48,8 +45,8 @@ Use these SciMiner Markdown docs:
 
 - `Transformer-Based Proprietary Library Virtual Screen` -> `Transformer-Based Proprietary Library Virtual Screen_api_doc.md`
 - `Docking-Based Proprietary Library Virtual Screen` -> `Docking-Based Proprietary Library Virtual Screen_api_doc.md`
-- `Get Box` -> `Get Box_api_doc.md`
-- `Get Protein Sequence` -> `Get Protein Sequence_api_doc.md`
+- `Transformer-Based Open Library Virtual Screen` -> `Transformer-Based Open Library Virtual Screen_api_doc.md`
+- `Docking-Based Open Library Virtual Screen` -> `Docking-Based Open Library Virtual Screen_api_doc.md`
 
 The agent MUST:
 
@@ -75,24 +72,20 @@ section, ask for correction or drop it with an explanation.
 
 ## Required workflow
 
-1. Determine whether the request is transformer-based screening,
-   docking-based screening, docking-box preparation, or protein-sequence
-   lookup.
+1. Determine whether the request is transformer-based screening or
+   docking-based screening, and whether it targets open or proprietary
+   libraries.
 2. Read the corresponding Markdown file or files from
    `https://sciminer.tech/tool_api_files/`.
-3. If docking-based screening lacks a docking box, read the `Get Box` doc and
-   run that step first.
-4. If transformer-based screening lacks a protein sequence, read the `Get
-   Protein Sequence` doc and run that step first.
-5. Choose the doc section that matches the user's input shape.
-6. Collect any missing required parameters from the user.
-7. Upload required file inputs exactly as described by the selected Markdown
+3. Choose the doc section that matches the user's input shape.
+4. Collect any missing required parameters from the user.
+5. Upload required file inputs exactly as described by the selected Markdown
    doc and replace local paths with returned `file_id` values.
-8. Write or run the invocation code directly from the selected Markdown doc's
+6. Write or run the invocation code directly from the selected Markdown doc's
    base-information block, parameter table, file-upload instructions, and
    example code. Do not apply a shared invocation template or local registry
    abstraction in this skill.
-9. Poll the task result and return the `share_url` in the final user-facing
+7. Poll the task result and return the `share_url` in the final user-facing
    summary.
 
 ## File upload rules
@@ -116,10 +109,8 @@ section, ask for correction or drop it with an explanation.
 
 ## Workflow guidance
 
-- Transformer-based library screening from protein sequence -> `Transformer-Based Proprietary Library Virtual Screen`
-- Docking-based library screening from receptor structure -> `Docking-Based Proprietary Library Virtual Screen`
-- Docking-box calculation -> `Get Box`
-- Protein-sequence lookup -> `Get Protein Sequence`
+- Transformer-based library screening from protein sequence -> `Transformer-Based Open Library Virtual Screen` or `Transformer-Based Proprietary Library Virtual Screen`
+- Docking-based library screening from receptor structure -> `Docking-Based Open Library Virtual Screen` or `Docking-Based Proprietary Library Virtual Screen`
 
 ## Notes
 
