@@ -1,8 +1,8 @@
 ---
 name: virtual-screening
 description: Virtual screening workflows for open and proprietary chemical libraries, including transformer-based screening and docking-based screening through SciMiner.
-required_environment_variables:
-    - SCIMINER_API_KEY
+credential_files:
+   - ~/.config/sciminer/credentials.json
 ---
 
 # Virtual Screening Skill
