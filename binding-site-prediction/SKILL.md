@@ -33,13 +33,13 @@ This skill supports protein ligand-binding site discovery workflows, including:
 
 ### Fast pocket discovery
 
-- Start with `run_p2rank_run_p2rank_post` from `P2Rank` when the goal is quick ML-based pocket ranking from an uploaded receptor structure.
-- Start with `run_fpocket_run_fpocket_post` from `fpocket` when the goal is to enumerate pocket geometries and inspect pocket-size-sensitive candidates.
+- Start with P2Rank when the goal is quick ML-based pocket ranking from an uploaded receptor structure.
+- Start with fpocket when the goal is to enumerate pocket geometries and inspect pocket-size-sensitive candidates.
 
 ### Consensus refinement
 
-- If both `P2Rank` and `fpocket` are available, compare the top-ranked pockets and prioritize overlapping sites.
-- Use `predict_gpu_predict_gpu_post` from `AF2BIND` on the same structure to inspect whether high-probability binding residues cluster around the same region.
+- If both P2Rank and fpocket are available, compare the top-ranked pockets and prioritize overlapping sites.
+- Use AF2BIND on the same structure to inspect whether high-probability binding residues cluster around the same region.
 
 ### Pre-docking handoff
 
