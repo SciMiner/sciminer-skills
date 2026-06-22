@@ -33,47 +33,47 @@ This skill supports end-to-end antibody engineering workflows, including:
 
 ### Phase 1: Sequence De-risking
 
-- Use `predict_predict_post` from `ANARCI` to number the starting heavy-chain and light-chain sequences.
+- Use ANARCI to number the starting heavy-chain and light-chain sequences.
 - Prefer `imgt` or `kabat` numbering so CDR1, CDR2, CDR3, and FR1-FR4 boundaries are explicit before any mutation planning.
-- Use `humanness_report_humanness_report__post` from `BioPhi` to establish the baseline humanness score and OASis-style sequence risk profile.
-- If the parental antibody is non-human or partially humanized, use `humanize_humanize__post` from `BioPhi` with `method="sapiens"` or `method="cdr_grafting"` to generate humanized sequence variants.
-- Use `designer_designer__post` and `mutate_mutate__post` from `BioPhi` to remove sequence-level developability liabilities while preserving critical residues identified by ANARCI numbering.
+- Use BioPhi to establish the baseline humanness score and OASis-style sequence risk profile.
+- If the parental antibody is non-human or partially humanized, use BioPhi with `method="sapiens"` or `method="cdr_grafting"` to generate humanized sequence variants.
+- Use BioPhi to remove sequence-level developability liabilities while preserving critical residues identified by ANARCI numbering.
 
 ### Phase 2: Modeling and Relaxation
 
-- Use `predict_predict_post` from `IgFold` for the parental antibody and shortlisted sequence variants.
+- Use IgFold for the parental antibody and shortlisted sequence variants.
 - For standard antibodies, provide paired heavy and light chains; for nanobody-like workflows, omit the light chain.
 - If affinity optimization is in scope, prefer an antibody-antigen complex structure for downstream scoring.
-- Use `fastrelax_fastrelax_post` from `Rosetta FastRelax` immediately after IgFold to reduce local clashes and move the model toward a more physically reasonable energy minimum.
+- Use Rosetta FastRelax immediately after IgFold to reduce local clashes and move the model toward a more physically reasonable energy minimum.
 - When structure drift must be limited, set `constrain_relax_to_start_coords=True` and tune `coordinate_constraint_weight` for local refinement.
 
 ### Phase 3: Developability Profiling
 
-- Use `sapscore_sapscore_post` from `Rosetta SAP Score` on the relaxed structures to quantify exposed hydrophobic aggregation risk.
+- Use Rosetta SAP Score on the relaxed structures to quantify exposed hydrophobic aggregation risk.
 - Treat high-SAP hotspots as developability liabilities, especially when a mutation improves affinity but worsens surface hydrophobic exposure.
 - Carry forward only candidates with acceptable sequence-level risk from BioPhi and acceptable structure-level aggregation risk from SAP analysis.
 
 ### Phase 4: High-throughput Initial Screening via FoldX
 
-- Use `structure_ops_structure_ops_post` from `FoldX` with `operation="RepairPDB"` before any downstream FoldX energy calculation.
-- Use `energy_ops_energy_ops_post` with `operation="PositionScan"` or `operation="AnalyseComplex"` to assess mutations affecting binding or interface energetics when an antibody-antigen complex structure is available.
-- Use `energy_ops_energy_ops_post` with `operation="Stability"` or `operation="AlaScan"` to identify positions that can improve structural robustness or destabilize problematic regions.
-- Use `structure_ops_structure_ops_post` with `operation="BuildModel"` to instantiate promising mutations or mutation combinations for explicit structural evaluation.
+- Use FoldX with `RepairPDB` before any downstream FoldX energy calculation.
+- Use FoldX `PositionScan` or `AnalyseComplex` to assess mutations affecting binding or interface energetics when an antibody-antigen complex structure is available.
+- Use FoldX `Stability` or `AlaScan` to identify positions that can improve structural robustness or destabilize problematic regions.
+- Use FoldX `BuildModel` to instantiate promising mutations or mutation combinations for explicit structural evaluation.
 - Use ANARCI-defined CDR boundaries to focus affinity maturation on CDR residues, and use FR or exposed non-core positions for stability or liability clean-up.
 - Prioritize a top candidate set where both $\Delta\Delta G_{bind}$ and $\Delta\Delta G_{fold}$ move in the desired direction rather than optimizing only one objective.
 
 ### Phase 5: Precision Design via Rosetta
 
-- Use `fastdesign_fastdesign_post` from `Rosetta FastDesign` on the best FoldX-derived structures to perform finer-grained side-chain and backbone redesign around prioritized regions.
+- Use Rosetta FastDesign on the best FoldX-derived structures to perform finer-grained side-chain and backbone redesign around prioritized regions.
 - Use the `resfile` input to restrict Rosetta redesign to intended CDR or framework positions instead of allowing uncontrolled global redesign.
-- Use `rosetta_interfaceanalyzer_rosetta_interfaceanalyzer_post` from `Rosetta InterfaceAnalyzer` to re-score top redesigned complexes and obtain a tighter interface-focused evaluation.
+- Use Rosetta InterfaceAnalyzer to re-score top redesigned complexes and obtain a tighter interface-focused evaluation.
 - Prefer `relax_script="InterfaceDesign2019"` when redesigning a bound antibody-antigen interface and `relax_script="MonomerDesign2019"` when optimizing isolated antibody regions.
 - Reject candidates whose Rosetta redesign gains come with worse SAP exposure or obvious framework distortion.
 
 ### Phase 6: Final Immunogenicity Check
 
-- Re-run `humanness_report_humanness_report__post` from `BioPhi` on the final Rosetta-optimized mutation panel to ensure new bulky or hydrophobic substitutions did not introduce unacceptable ADA risk.
-- Use `designer_designer__post` or `mutate_mutate__post` from `BioPhi` again when a final sequence adjustment is needed after Rosetta redesign.
+- Re-run BioPhi on the final Rosetta-optimized mutation panel to ensure new bulky or hydrophobic substitutions did not introduce unacceptable ADA risk.
+- Use BioPhi again when a final sequence adjustment is needed after Rosetta redesign.
 - Select the final Top 10-20 candidates by balancing FoldX energetic improvements, Rosetta interface quality, SAP developability risk, IgFold structural plausibility, and BioPhi safety metrics.
 
 ## Prerequisites
