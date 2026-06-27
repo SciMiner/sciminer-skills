@@ -1,6 +1,6 @@
 ---
 name: pharma-intelligence
-description: >
+description:
   In-depth, multi-region pharmaceutical intelligence search and synthesis,
   plus drug repurposing, target discovery, clinical evidence review, and
   bioactivity analysis. Use this skill whenever the user asks about drug
