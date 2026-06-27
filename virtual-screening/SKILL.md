@@ -14,6 +14,10 @@ This skill groups end-to-end virtual screening workflows, including:
 - transformer-based open library virtual screening
 - docking-based open library virtual screening
 
+All four screening tools include pre-set compound libraries, so no additional downloading or preparation is needed for standard runs. Users may also provide their own compound libraries.
+
+If users have special compound-library requirements, such as screening compounds containing acrylamide, they can first use `OpenData_api_doc.md` from `https://sciminer.tech/tool_api_files/` to download the corresponding molecular library, filter it, and then import the curated library into the screening tool.
+
 ## When to use this skill
 
 - Screen proprietary or open chemical libraries against a protein target
