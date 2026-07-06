@@ -20,7 +20,7 @@ description:
 
 Systematic, source-prioritized search and synthesis across regulatory, clinical,
 academic, and commercial databases — covering all major pharmaceutical markets
-and 14+ biomedical research databases.
+and 20+ biomedical research databases.
 
 ## Sub-Skills — How to Invoke
 
@@ -46,6 +46,14 @@ For the per-region source map (CN / US / EU / JP / KR / AU + global) with URLs a
 
 ---
 
+## Tool Access Notes
+
+`web_fetch` is the default tool for any URL in this skill that isn't covered by a bundled sub-skill. Some sites are JavaScript-rendered or block plain HTTP fetches — Google Patents is the most common offender, and CTIS, jRCT, and ANZCTR occasionally behave the same way — but this can happen on **any** site, not just those.
+
+**Rule:** try `web_fetch` first. If it returns empty, blocked, or placeholder content, retry the exact same URL with `browser_navigate` before concluding that a source has no data. Every other section in this skill that mentions `web_fetch` defers to this rule rather than restating it.
+
+---
+
 ## Search Workflow
 
 ### Step 1 — Classify the Query (pick ONE intent)
@@ -65,7 +73,7 @@ Also capture: **regions in scope** (US / EU / JP / CN / KR / AU / global) and **
 
 ### Step 2 — Execute the Per-Intent Sequence
 
-Run the workflow for the chosen intent (see [Per-Intent Workflows](#per-intent-workflows)) in order. For sources without MCP coverage (CN NMPA/CDE, EMA EPAR, PMDA, jRCT, CTIS, CRIS, ANZCTR, Orange Book), use `web_fetch` only at the steps that name them.
+Run the workflow for the chosen intent (see [Per-Intent Workflows](#per-intent-workflows)) in order. For sources without MCP coverage (CN NMPA/CDE, EMA EPAR, PMDA, jRCT, CTIS, CRIS, ANZCTR, Orange Book), use `web_fetch` only at the steps that name them, following the fallback rule in [Tool Access Notes](#tool-access-notes).
 
 Resolve identifiers as needed:
 - Free-text disease → MONDO/EFO ID via `opentargets-skill` or `efo-ontology-skill`
@@ -147,7 +155,7 @@ Default scope = ALL regions. A competitive landscape without the active-trial pi
 
 1. **Active trials — all regions** — run [Workflow A](#a-trial-landscape) steps 1–7 in full, optionally adding `filter.overallStatus=RECRUITING` (or `ACTIVE_NOT_RECRUITING`) and a phase filter to focus on competitors at a specific stage.
 2. **Company disclosures** — `web_fetch` SEC EDGAR full-text search at `https://efts.sec.gov/LATEST/search-index` for pipeline language in 10-K / 10-Q / 8-K (US-listed sponsors only).
-3. **Patent activity per company** — `web_fetch` `https://patents.google.com` with an `assignee:` filter (or WIPO PATENTSCOPE / Espacenet — see Workflow E).
+3. **Patent activity per company** — `web_fetch` `https://patents.google.com/?assignee=companyname` (see Workflow E, step 1, for the exact query format and non-English name handling; or use WIPO PATENTSCOPE / Espacenet as alternatives).
 4. **Published results** — `ncbi-entrez-skill` (`db=pubmed`) with NCT IDs or drug names to surface completed-trial papers.
 
 Aggregate into one table: drug × company × phase × mechanism × registry/region.
@@ -156,8 +164,8 @@ Aggregate into one table: drug × company × phase × mechanism × registry/regi
 
 All listed patent sources are free and require no API key.
 
-1. **Global patent search** — `web_fetch` one or more of:
-   - `https://patents.google.com` (Google Patents — best full-text search, covers USPTO, EPO, WIPO, JPO, CNIPA, KIPO).
+1. **Global patent search** — `web_fetch` one or more of (see [Tool Access Notes](#tool-access-notes) for the `browser_navigate` fallback):
+   - `https://patents.google.com` (Google Patents — best full-text search, covers USPTO, EPO, WIPO, JPO, CNIPA, KIPO). To retrieve all patents assigned to a specific company, query `https://patents.google.com/?assignee=companyname`. If the company's name is non-English, first search with the original non-English name, then run a second search with the English translation/transliteration — assignee records are not always normalized across languages, so neither search alone is reliable.
    - `https://patentscope.wipo.int` (WIPO PATENTSCOPE — authoritative for PCT applications and national filings worldwide).
    - `https://worldwide.espacenet.com` (EPO Espacenet — strongest European and family-tree coverage).
 2. **US patents (structured)** — `uspto_ppubs_search_patents` via MCP for granted patents and applications.
@@ -213,7 +221,7 @@ Most APIs require no key. Exceptions:
 | NCI Clinical Trials | Optional | https://clinicaltrialsapi.cancer.gov |
 | OpenFDA | Optional (higher rate limits) | https://open.fda.gov/apis |
 
-All bundled sub-skills (ChEMBL, OpenTargets, PubMed via NCBI Entrez, ClinicalTrials.gov, Reactome, UniProt, GWAS Catalog, Ensembl) are public and require no key. Patent landscape work uses Google Patents, WIPO PATENTSCOPE, and Espacenet via `web_fetch` — no keys required.
+All bundled sub-skills (ChEMBL, OpenTargets, PubMed via NCBI Entrez, ClinicalTrials.gov, Reactome, UniProt, GWAS Catalog, Ensembl) are public and require no key. Patent landscape work uses Google Patents, WIPO PATENTSCOPE, and Espacenet — no keys required.
 
 ---
 
@@ -243,6 +251,9 @@ All bundled sub-skills (ChEMBL, OpenTargets, PubMed via NCBI Entrez, ClinicalTri
 
 **Source not covered by a sub-skill?**
 - Use `web_fetch` directly for CDE/NMPA, EMA/EPAR, PMDA, jRCT, CTIS, CRIS, ANZCTR, Orange Book, openFDA, DailyMed, FAERS, and EDGAR.
+
+**`web_fetch` returns empty, blocked, or placeholder content?**
+- See [Tool Access Notes](#tool-access-notes): retry the same URL with `browser_navigate` before concluding the source has no data.
 
 ---
 
