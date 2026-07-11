@@ -16,7 +16,7 @@ This skill groups end-to-end virtual screening workflows, including:
 
 All four screening tools include pre-set compound libraries, so no additional downloading or preparation is needed for standard runs. Users may also provide their own compound libraries.
 
-If users have special compound-library requirements, such as screening compounds containing acrylamide, they can first use `OpenData_api_doc.md` from `https://sciminer.tech/tool_api_files/` to download the corresponding molecular library, filter it, and then import the curated library into the screening tool.
+If users have special compound-library requirements, such as screening compounds containing acrylamide, they can first use `OpenData_api_doc.md` from `https://sciminer.simm.ac.cn/tool_api_files/` to download the corresponding molecular library, filter it, and then import the curated library into the screening tool.
 
 ## When to use this skill
 
@@ -81,7 +81,7 @@ section, ask for correction or drop it with an explanation.
    docking-based screening, and whether it targets open or proprietary
    libraries.
 2. Read the corresponding Markdown file or files from
-   `https://sciminer.tech/tool_api_files/`.
+   `https://sciminer.simm.ac.cn/tool_api_files/`.
 3. Choose the doc section that matches the user's input shape.
 4. Collect any missing required parameters from the user.
 5. Upload required file inputs exactly as described by the selected Markdown
