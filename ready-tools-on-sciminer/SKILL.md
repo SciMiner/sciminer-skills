@@ -67,7 +67,7 @@ single source of truth for the chosen tool. The agent MUST:
 
 ## Prerequisites
 
-1. `SCIMINER_API_KEY` is pre-obtained by the SciMiner-Hermes gateway before the
+1. `SCIMINER_API_KEY` is pre-obtained by the SciMiner gateway before the
    agent run reaches this skill.
 2. Use the runtime `SCIMINER_API_KEY` directly as the `X-Auth-Token` for
    SciMiner tool calls.

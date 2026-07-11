@@ -11,7 +11,7 @@ Build a transparent hypothesis, not a mechanism claim. Keep experimental, curate
 
 ## Prerequisites and boundaries
 
-- `SCIMINER_API_KEY` must be injected by the SciMiner-Hermes gateway before skill execution. Use it directly as the `X-Auth-Token` for SciMiner tool calls; never print, copy, or persist the key.
+- `SCIMINER_API_KEY` must be injected by the SciMiner gateway before skill execution. Use it directly as the `X-Auth-Token` for SciMiner tool calls; never print, copy, or persist the key.
 - If `SCIMINER_API_KEY` is unavailable at runtime, stop and report that the gateway did not inject the required credential. Do not attempt to derive or locate the API key through other means.
 - Resolve every SciMiner capability from the live tool-doc index at `https://sciminer.tech/tool_api_files/` and read the selected `*_api_doc.md` immediately before invocation. That document is authoritative for provider/tool names, parameters, upload behavior, polling, and results.
 - Return each successful task's `share_url`. Preserve its `task_id` and source-document URL in the project manifest.

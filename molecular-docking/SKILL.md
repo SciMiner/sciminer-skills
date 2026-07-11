@@ -100,7 +100,7 @@ section, ask for correction or drop it with an explanation.
 - Use the selected Markdown doc under
     `https://sciminer.tech/tool_api_files/` as the authoritative source for
     payload construction and invoke-method details.
-- This skill requires the `SCIMINER_API_KEY` environment variable to be injected by the SciMiner-Hermes gateway before skill execution. The API key is sent as the `X-Auth-Token` header.
+- This skill requires the `SCIMINER_API_KEY` environment variable to be injected by the SciMiner gateway before skill execution. The API key is sent as the `X-Auth-Token` header.
 - If `SCIMINER_API_KEY` is not available at skill runtime, stop and report that the gateway did not inject the required credential. Do not attempt to derive or locate the API key through other means.
 - `provider_name` must exactly match the selected Markdown doc.
 - Use the selected Markdown doc to determine file inputs, parameter placement,

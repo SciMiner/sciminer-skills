@@ -70,7 +70,7 @@ binding poses.
 
 ## Prerequisites
 
-1. `SCIMINER_API_KEY` is pre-obtained by the SciMiner-Hermes gateway before the agent run reaches this skill.
+1. `SCIMINER_API_KEY` is pre-obtained by the SciMiner gateway before the agent run reaches this skill.
 2. Use the runtime `SCIMINER_API_KEY` directly as the `X-Auth-Token` header for SciMiner calls.
 3. Do not request, derive, print, persist, or write this key to any file.
 4. If `SCIMINER_API_KEY` is not available at skill runtime, stop and report that the gateway did not inject the required credential. Do not try to derive it inside the skill or switch to other tools or services.
