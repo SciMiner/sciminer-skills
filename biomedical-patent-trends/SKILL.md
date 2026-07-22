@@ -1,6 +1,6 @@
 ---
 name: biomedical-patent-trends
-description: Download, search, and analyze Patent-Mol-Wiki biomedical-patent packages, producing a self-contained interactive HTML visualization. Use when users ask what happened in a recent patent period, need portfolio or trend statistics from wiki index.md files, ask whether a target, disease, modality, organization, or patent is present, need charts of patent distributions, or need molecular-structure analysis from selected patent folders.
+description: Download, search, and analyze Patent-Mol-Wiki biomedical-patent packages, producing a presentation-focused HTML trends report. Use when users ask what happened in a recent patent period, need portfolio or trend statistics from wiki index.md files, ask whether a target, disease, modality, organization, or patent is present, need patent-distribution analysis, or need molecular-structure analysis from selected patent folders.
 required_environment_variables:
   - SCIMINER_API_KEY
 ---
@@ -11,36 +11,37 @@ Analyze the supplied Patent-Mol-Wiki corpus as a local, potentially very large k
 
 ## Prepare or update the corpus
 
-1. Read [Patent-Mol-Wiki API reference](references/patent-mol-wiki-api.md) before invoking the service. Use the runtime `SCIMINER_API_KEY`, injected by the SciMiner gateway, as `X-Auth-Token`; never print, persist, or place it in prompts, logs, or repository files.
-2. For a period request, use `scripts/download_wiki.py --date-range recent_week --outdir <project>/data`. Use `--patent-ids` only when the user supplied patent numbers; it overrides the date range. Preserve the script's task manifest and raw service response beside the downloaded archive.
-3. Locate the extracted wiki roots and their `index.md` files with `rg --files <data-root> -g index.md`. Treat each index as the authoritative aggregate view for its own wiki folder.
-4. Create an analysis workspace outside the corpus (for example, `<project>/analysis/<period>/`) so downloads remain immutable and derived artifacts are separable.
+1. Immediately before every service invocation, fetch and read the latest `Patent-Mol-Wiki_api_doc.md` from `https://sciminer.tech/tool_api_files/`. Treat that live document as authoritative for the provider name, tool name, parameters, request encoding, polling, and result handling. Use the runtime `SCIMINER_API_KEY`, injected by the SciMiner gateway, as `X-Auth-Token`; never print, persist, or place it in prompts, logs, or repository files. Do not use a cached or repository-bundled copy of the API documentation.
+2. After obtaining the corpus according to that live document, locate the extracted wiki roots and their `index.md` files with `rg --files <data-root> -g index.md`. Treat each index as the authoritative aggregate view for its own wiki folder.
+3. Create an analysis workspace outside the corpus (for example, `<project>/analysis/<period>/`) so downloads remain immutable and derived artifacts are separable.
 
 ## Route the question
 
 | Request | First action | Deliverable |
 |---|---|---|
-| “What happened in the recent week?” or other open-ended period review | Read every `index.md`, then run `scripts/index_stats.py` across them. Inspect a small, transparent sample of patents only to explain the leading changes. | `weekly_summary.json`, `patent_trends.html`, chart SVG, concise trend brief |
+| “What happened in the recent week?” or other open-ended period review | Read every `index.md`, then run `scripts/index_stats.py` across them. Inspect a small, transparent sample of patents only to explain the leading changes. | `weekly_summary.json`, `patent_trends.html`, concise trend brief |
 | Target, disease, modality, company, or patent lookup | Build aliases first, then use `scripts/search_wiki.py` against the extracted corpus. Read only the returned files and surrounding passages. | matched patent table, evidence snippets, coverage/alias caveat |
-| Distribution/comparison question | Derive counts from the relevant `index.md` or matched-result table; generate a chart suited to the number of categories. | CSV/JSON plus self-contained `patent_trends.html` (and optional SVG) |
+| Distribution/comparison question | Derive counts from the relevant `index.md` or matched-result table. | CSV/JSON plus `patent_trends.html` |
 | Molecular-structure question | Search metadata/text first to identify candidate patent folders, then read [structure-analysis.md](references/structure-analysis.md) and run the structure script only there. | structure table, method/version, results, limitations |
 
 Never begin a targeted question by opening every patent text file. Search filenames and extracted text first, use specific aliases, and report the exact search root, query set, files searched, and match count.
 
 ## Default report: “What happened in the recent week?”
 
-1. Download `recent_week` unless a fresh extracted weekly package already exists and its manifest proves the coverage. Do not silently substitute calendar week dates for the provider's range.
+1. Confirm the corpus coverage from its manifest. Do not silently substitute calendar-week dates for the provider-defined coverage.
 2. Inventory wiki roots and index files. Run:
 
    ```powershell
    python scripts/index_stats.py <data-root> --outdir <analysis-root>
    ```
 
-3. Use the generated aggregate counts and charts to describe patent volume, targets, diseases, organizations, modalities/technical fields, patent types, and leading ranked categories when those fields are present. Compare with the immediately preceding period only if its package exists and has compatible index fields.
+3. Use the generated aggregate counts to describe patent volume, targets, diseases, organizations, inventors, modalities/technical fields, patent types, and leading ranked categories when those fields are present. Compare with the immediately preceding period only if its package exists and has compatible index fields.
 4. To explain a leading category, search it with `scripts/search_wiki.py` and read the matched entries. Do not infer a trend simply because a keyword appears many times in boilerplate.
-5. Deliver: coverage and collection time; headline numbers; notable concentrations/new entities; `patent_trends.html`; 3–5 evidence-backed observations; and exclusions/uncertainties. Link every conclusion to an index metric or listed patent identifiers. The HTML must open offline, embed only derived results, identify its source and caveats, and be the primary visualization deliverable; SVG charts are supplementary.
+5. Deliver: coverage and collection time; headline numbers; notable concentrations/new entities; `patent_trends.html`; 3–5 evidence-backed observations; and exclusions/uncertainties. Link every conclusion to an index metric or listed patent identifiers. The HTML must embed only derived results and identify its source and caveats.
 
-Use a horizontal bar chart for ranked categories, a stacked/grouped bar chart for compatible period comparisons, and a line chart only for three or more comparable time periods. Include labels, the total denominator, a readable title, and an explicit “source: local Patent-Mol-Wiki index.md” caption. Do not use a word cloud as the sole quantitative evidence.
+## HTML visualization standard
+
+Use [analysis_recent_week_patent_trends_report.html](references/analysis_recent_week_patent_trends_report.html) as the sole visualization and layout reference. Keep its report title and coverage metadata, headline metrics, visual-analysis section, inventor-distribution section, evidence-backed observations, noteworthy-theme cards, source/provenance, and interpretation limits. This is a presentation report, not a patent retrieval interface: do not include patent-evidence tables, search boxes, filters, or other lookup controls. Use only local, derived data in the file and never fabricate observations, inventor names or counts, labels, patent identifiers, classifications, or period comparisons. If inventor metadata is absent or incomplete, show that limitation in the inventor-distribution section instead of estimating a distribution.
 
 ## Targeted retrieval
 
@@ -73,4 +74,4 @@ If `SCIMINER_API_KEY` is unavailable at runtime, stop and report that the gatewa
 
 ## Patent-per-folder package layout
 
-Some provider downloads contain one `index.md` per patent (`profile: patmap-wiki-data-v1`) rather than a dashboard index with precomputed categories. In that layout, count the patent folders and run `scripts/summarize_wiki.py <wiki-root> --outdir <analysis-root>` for a reproducible overview. It produces patent titles, transparent overlapping modality/disease keyword counts, SVG charts, and `patent_trends.html`. Do not represent these keyword counts as claim-level classifications or target annotations. Use `scripts/search_wiki.py` followed by claim inspection for a specific target, disease, company, or structure question.
+Some provider downloads contain one `index.md` per patent (`profile: patmap-wiki-data-v1`) rather than a dashboard index with precomputed categories. In that layout, count the patent folders and run `scripts/summarize_wiki.py <wiki-root> --outdir <analysis-root>` for a reproducible overview. It produces patent titles, transparent overlapping modality/disease keyword counts, inventor counts when inventor metadata is present, and `patent_trends.html`. Do not represent these keyword counts as claim-level classifications or target annotations. Use `scripts/search_wiki.py` followed by claim inspection for a specific target, disease, company, or structure question.

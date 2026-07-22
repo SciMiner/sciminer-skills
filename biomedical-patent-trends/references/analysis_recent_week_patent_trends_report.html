@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patent-Mol-Wiki 最近一周生物医学专利趋势报告</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #dbeafe;
+            --success: #059669;
+            --success-light: #d1fae5;
+            --warning: #d97706;
+            --warning-light: #fef3c7;
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-600: #475569;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(37, 99, 235, 0.2);
+        }
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        header .subtitle {
+            opacity: 0.9;
+            font-size: 1.05rem;
+        }
+        header .meta {
+            margin-top: 1rem;
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+            opacity: 0.85;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary);
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1;
+        }
+        .stat-card .label {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        .stat-card.success { border-left-color: var(--success); }
+        .stat-card.success .number { color: var(--success); }
+        .stat-card.warning { border-left-color: var(--warning); }
+        .stat-card.warning .number { color: var(--warning); }
+        .stat-card.danger { border-left-color: var(--danger); }
+        .stat-card.danger .number { color: var(--danger); }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .section-title::before {
+            content: "";
+            display: inline-block;
+            width: 4px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+        .chart-container {
+            position: relative;
+            height: 350px;
+        }
+        .empty-state {
+            padding: 1.25rem;
+            color: var(--gray-600);
+            background: var(--gray-50);
+            border: 1px dashed var(--gray-200);
+            border-radius: 8px;
+        }
+
+        .observation-list {
+            list-style: none;
+        }
+        .observation-list li {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        .observation-list li:last-child { border-bottom: none; }
+        .obs-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 700;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            margin-top: 0.1rem;
+        }
+        .obs-content h4 {
+            font-size: 1.05rem;
+            margin-bottom: 0.25rem;
+            color: var(--gray-900);
+        }
+        .obs-content p {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+        }
+
+        .patent-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        .patent-table th {
+            background: var(--gray-100);
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-600);
+            border-bottom: 2px solid var(--gray-200);
+        }
+        .patent-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .patent-table tr:hover { background: var(--gray-50); }
+        .patent-id {
+            font-family: "SF Mono", Monaco, monospace;
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .tag {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.3rem;
+        }
+        .tag-adc { background: var(--danger-light); color: var(--danger); }
+        .tag-cart { background: var(--primary-light); color: var(--primary); }
+        .tag-protac { background: var(--warning-light); color: var(--warning); }
+        .tag-rna { background: var(--success-light); color: var(--success); }
+        .tag-bsab { background: #e0e7ff; color: #4338ca; }
+
+        .risk-box {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+        }
+        .risk-box h4 {
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .risk-box ul {
+            margin-left: 1.2rem;
+            color: #78350f;
+        }
+        .risk-box li {
+            margin: 0.3rem 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-600);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            header h1 { font-size: 1.5rem; }
+            .chart-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>最近一周生物医学专利趋势分析</h1>
+            <div class="subtitle">Patent-Mol-Wiki Recent Week Biomedical Patent Trends</div>
+            <div class="meta">
+                <span>📅 分析日期：2026-07-21</span>
+                <span>📦 数据来源：Patent-Mol-Wiki recent_week</span>
+                <span>📄 总专利数：215 件</span>
+                <span>🔬 模态：6 类</span>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="number">215</div>
+                <div class="label">总专利数 (WO 公开)</div>
+            </div>
+            <div class="stat-card success">
+                <div class="number">93</div>
+                <div class="label">涉及生物制品 (43.3%)</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">81</div>
+                <div class="label">涉及基因/RNA (37.7%)</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="number">63</div>
+                <div class="label">涉及小分子 (29.3%)</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="number">55</div>
+                <div class="label">涉及抗体 (25.6%)</div>
+            </div>
+            <div class="stat-card success">
+                <div class="number">43</div>
+                <div class="label">涉及细胞治疗 (20.0%)</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">可视化分析</div>
+            <div class="chart-grid">
+                <div>
+                    <h3 style="margin-bottom:1rem;color:var(--gray-600);font-size:1rem;">技术模态分布</h3>
+                    <div class="chart-container">
+                        <canvas id="modalityChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="margin-bottom:1rem;color:var(--gray-600);font-size:1rem;">疾病领域分布</h3>
+                    <div class="chart-container">
+                        <canvas id="diseaseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:2rem;">
+                <h3 style="margin-bottom:1rem;color:var(--gray-600);font-size:1rem;">标题高频词 Top 15</h3>
+                <div class="chart-container" style="height:400px;">
+                    <canvas id="termsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">发明人分布</div>
+            <div class="empty-state">
+                当前 <code>patmap-wiki-data-v1</code> 索引未系统提供发明人字段，因此无法从本地数据可靠计算发明人专利分布。此处不估算或补造姓名与计数；后续数据包含明确发明人元数据时，应按“每位发明人对应的专利件数”展示。
+            </div>
+            <p style="margin:.75rem 0 0;color:var(--gray-600);font-size:.8rem;">来源：本地 Patent-Mol-Wiki index.md；本期无可用发明人分布数据。</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">五大关键观察</div>
+            <ul class="observation-list">
+                <li>
+                    <span class="obs-badge">观察 1</span>
+                    <div class="obs-content">
+                        <h4>ADC 与偶联技术仍是热点，且向新靶点扩展</h4>
+                        <p>本周出现 Anti-BCMA ADC、Anti-HER3 ADC 与 Anti-HER2 组合，以及 3 件密集布局的 GPC3 靶向多肽药物偶联物。均一化 ADC 制备方法（WO2026145226）和稳定化 ADC 组合物（WO2026087510）显示工艺创新并行。</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="obs-badge">观察 2</span>
+                    <div class="obs-content">
+                        <h4>CAR-T 从血液瘤向实体瘤和自身免疫病渗透</h4>
+                        <p>FAP 靶向 CAR-T（WO2026144067）、CLDN18.2 CAR-T（WO2026145642）、自身免疫病关节炎症 CAR-T（WO2026107319）以及体内 CAR-T（WO2026143319，抗体偶联 LNP 递送 RNA）表明技术路径多元化。</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="obs-badge">观察 3</span>
+                    <div class="obs-content">
+                        <h4>双特异性抗体持续活跃，EGFR/c-MET 组合受关注</h4>
+                        <p>EGFR/c-MET 双抗及其 ADC（WO2026145674、WO2026145588）、LRRC15×TAA 多特异性抗体（WO2026112478）以及分泌 CD20-BiTE 的 CD19-CAR-T（WO2026147189）体现了双靶点策略的深化。</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="obs-badge">观察 4</span>
+                    <div class="obs-content">
+                        <h4>靶向蛋白降解（PROTAC/分子胶）出现新靶点</h4>
+                        <p>PTPN2/PTP1B 降解剂（WO2026119184，覆盖肿瘤+代谢+免疫）、c-MET PROTAC（WO2026145483）和蛋白降解剂前药（WO2026145485）显示该领域靶点选择正在拓宽。</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="obs-badge">观察 5</span>
+                    <div class="obs-content">
+                        <h4>RNA 疗法与递送系统创新并行</h4>
+                        <p>Factor XI RNAi（WO2026117631）、环状 RNA 生产方法（WO2026143489）、抗体偶联 LNP 体内 CAR-T（WO2026143319）以及核酸病毒颗粒（WO2026145253）展现 RNA 技术的多维度布局。</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-title">值得关注的代表性专利</div>
+            <table class="patent-table">
+                <thead>
+                    <tr>
+                        <th>专利号</th>
+                        <th>标题</th>
+                        <th>技术标签</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="patent-id">WO2026119184</span></td>
+                        <td>PTPN2/PTP1B Degraders and Therapeutic Method Thereof</td>
+                        <td><span class="tag tag-protac">PROTAC</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="patent-id">WO2026146306</span></td>
+                        <td>Anti-BCMA Antibody Drug Conjugates and Uses Thereof</td>
+                        <td><span class="tag tag-adc">ADC</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="patent-id">WO2026145674</span></td>
+                        <td>靶向 EGFR 和 c-MET 的双特异性抗体以及其抗体药物偶联物及其用途</td>
+                        <td><span class="tag tag-bsab">双抗</span><span class="tag tag-adc">ADC</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="patent-id">WO2026143319</span></td>
+                        <td>In Vivo CAR-T Therapy Comprising Targeting Delivery of RNA by a Novel Antibody-Conjugated LNP</td>
+                        <td><span class="tag tag-cart">CAR-T</span><span class="tag tag-rna">RNA/LNP</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="patent-id">WO2026145642</span></td>
+                        <td>一种靶向 CLDN18.2 的嵌合抗原受体及其应用</td>
+                        <td><span class="tag tag-cart">CAR-T</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="patent-id">WO2026145483</span></td>
+                        <td>靶向 c-MET 蛋白降解靶向嵌合体类化合物及其组合物及用途</td>
+                        <td><span class="tag tag-protac">PROTAC</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="patent-id">WO2026144067</span></td>
+                        <td>一种靶向成纤维细胞激活蛋白的 CAR-T 细胞及其制备方法和应用</td>
+                        <td><span class="tag tag-cart">CAR-T</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="patent-id">WO2026117631</span></td>
+                        <td>Factor XI RNAi Agent Compositions and Methods of Use Thereof</td>
+                        <td><span class="tag tag-rna">RNAi</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="patent-id">WO2026145526</span></td>
+                        <td>抗 HER3 抗体药物偶联物与抗 HER2 抗体的药物组合及其用途</td>
+                        <td><span class="tag tag-adc">ADC</span><span class="tag tag-bsab">组合</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="patent-id">WO2026144861</span></td>
+                        <td>靶向 CLDN18.2 的抗原结合蛋白及其应用</td>
+                        <td><span class="tag tag-adc">抗体</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="patent-id">WO2026145226</span></td>
+                        <td>一种制备均一化的抗体-药物偶联物的方法及试剂盒</td>
+                        <td><span class="tag tag-adc">ADC 工艺</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="patent-id">WO2026145793</span></td>
+                        <td>特异性结合 GPC3 的多肽及其药物偶联物与应用</td>
+                        <td><span class="tag tag-adc">PDC</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-title">其他值得注意的靶点</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;">
+                <div style="background:var(--gray-50);padding:1rem;border-radius:8px;">
+                    <strong style="color:var(--primary);">TOP1（拓扑异构酶I）</strong>
+                    <p style="font-size:0.85rem;color:var(--gray-600);margin-top:0.25rem;">WO2026115318 — 小分子抑制剂</p>
+                </div>
+                <div style="background:var(--gray-50);padding:1rem;border-radius:8px;">
+                    <strong style="color:var(--primary);">TL1A</strong>
+                    <p style="font-size:0.85rem;color:var(--gray-600);margin-top:0.25rem;">WO2026145473 — 抗体，IBD/免疫</p>
+                </div>
+                <div style="background:var(--gray-50);padding:1rem;border-radius:8px;">
+                    <strong style="color:var(--primary);">BTK</strong>
+                    <p style="font-size:0.85rem;color:var(--gray-600);margin-top:0.25rem;">WO2026147931 — 抑制剂用于炎症</p>
+                </div>
+                <div style="background:var(--gray-50);padding:1rem;border-radius:8px;">
+                    <strong style="color:var(--primary);">KAT6A/B</strong>
+                    <p style="font-size:0.85rem;color:var(--gray-600);margin-top:0.25rem;">WO2026144956 — 表观遗传多晶型</p>
+                </div>
+                <div style="background:var(--gray-50);padding:1rem;border-radius:8px;">
+                    <strong style="color:var(--primary);">MAGE-A4 TCR-T</strong>
+                    <p style="font-size:0.85rem;color:var(--gray-600);margin-top:0.25rem;">WO2026145031 — 实体瘤 TCR-T</p>
+                </div>
+                <div style="background:var(--gray-50);padding:1rem;border-radius:8px;">
+                    <strong style="color:var(--primary);">IDO1/TDO 双重抑制</strong>
+                    <p style="font-size:0.85rem;color:var(--gray-600);margin-top:0.25rem;">WO2026144375 — 肿瘤免疫代谢</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">主要风险与不确定性</div>
+            <div class="risk-box">
+                <h4>⚠️ 分析局限说明</h4>
+                <ul>
+                    <li><strong>覆盖局限：</strong>本分析仅基于 Patent-Mol-Wiki <code>recent_week</code> 单一数据包，不涵盖全部当周全球专利公开。未命中不等于不存在。</li>
+                    <li><strong>分类重叠：</strong>关键词计数代表标题/摘要中的提及频率，非权利要求级别的独家分类。例如 ADC 专利同时贡献 antibody、small molecule 和 biologic 计数。</li>
+                    <li><strong>申请人及发明人信息缺失：</strong>当前 <code>patmap-wiki-data-v1</code> 索引未系统包含申请人和发明人字段，未能生成组织级 portfolio 或发明人分布分析。</li>
+                    <li><strong>无前一周期对比：</strong>缺少上一周数据包，无法做周环比趋势判断。</li>
+                </ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>Generated by SciMiner Patent-Mol-Wiki Analysis Skill | ProtonUnfold Team</p>
+            <p style="margin-top:0.5rem;opacity:0.7;">Source: local Patent-Mol-Wiki index.md corpus | N=215 patents</p>
+        </footer>
+    </div>
+
+    <script>
+        const modalities = {
+            labels: ['Biologic', 'Gene/RNA', 'Small Molecule', 'Antibody', 'Cell Therapy', 'Vaccine'],
+            data: [93, 81, 63, 55, 43, 7]
+        };
+        const diseases = {
+            labels: ['Oncology', 'Immuno/Inflammation', 'Neurology', 'Infectious', 'Metabolic', 'Cardiovascular'],
+            data: [74, 69, 28, 23, 20, 16]
+        };
+        const terms = {
+            labels: ['treating','cancer','uses','inhibitors','receptor','disease','pharmaceutical','CAR-T','diseases','production','antibody','inhibitor','conjugates','binding','proteins'],
+            data: [18,10,9,9,7,6,5,5,5,5,5,4,4,4,4]
+        };
+
+        Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif';
+        Chart.defaults.color = '#475569';
+
+        new Chart(document.getElementById('modalityChart'), {
+            type: 'bar',
+            data: {
+                labels: modalities.labels,
+                datasets: [{
+                    label: 'Keyword mentions',
+                    data: modalities.data,
+                    backgroundColor: ['#2563eb','#059669','#d97706','#dc2626','#7c3aed','#0891b2'],
+                    borderRadius: 6,
+                    barPercentage: 0.6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => `${ctx.raw} mentions (${(ctx.raw/215*100).toFixed(1)}%)`
+                        }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('diseaseChart'), {
+            type: 'doughnut',
+            data: {
+                labels: diseases.labels,
+                datasets: [{
+                    data: diseases.data,
+                    backgroundColor: ['#dc2626','#2563eb','#7c3aed','#059669','#d97706','#0891b2'],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { padding: 16, usePointStyle: true } },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => `${ctx.label}: ${ctx.raw} (${(ctx.raw/215*100).toFixed(1)}%)`
+                        }
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('termsChart'), {
+            type: 'bar',
+            data: {
+                labels: terms.labels,
+                datasets: [{
+                    label: 'Frequency in titles',
+                    data: terms.data,
+                    backgroundColor: '#2563eb',
+                    borderRadius: 4,
+                    barPercentage: 0.5
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => `Frequency: ${ctx.raw}`
+                        }
+                    }
+                },
+                scales: {
+                    x: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -15,6 +15,7 @@ Build a transparent hypothesis, not a mechanism claim. Keep experimental, curate
 - If `SCIMINER_API_KEY` is unavailable at runtime, stop and report that the gateway did not inject the required credential. Do not attempt to derive or locate the API key through other means.
 - Resolve every SciMiner capability from the live tool-doc index at `https://sciminer.tech/tool_api_files/` and read the selected `*_api_doc.md` immediately before invocation. That document is authoritative for provider/tool names, parameters, upload behavior, polling, and results.
 - Return each successful task's `share_url`. Preserve its `task_id` and source-document URL in the project manifest.
+- Treat `network_report.html` as mandatory for every completed analysis, including empty, negative, or partial-result analyses. Do not replace it with a prose-only answer, a CSV-only handoff, or a network image.
 - Do not use a target prediction, a network centrality score, enrichment, or docking score as proof of binding, efficacy, synergy, causality, or clinical benefit.
 - Do not call a tool with guessed parameters. Ask for missing required inputs or omit the optional analysis.
 
@@ -62,7 +63,7 @@ Read [evidence-model.md](references/evidence-model.md) before scoring, filtering
 - Attach `evidence_tier`, `evidence_type`, `source`, `access_date`, `score_or_value`, and `direction` to every eligible edge. Use `unknown` rather than inferring activation or inhibition.
 - Report graph size, isolated nodes, connected components, source composition, and confidence-filter sensitivity before selecting hubs or modules.
 - Treat frequent network hubs (for example, TP53, AKT1, TNF, IL6) as generic candidates until disease relevance, tissue/cell context, and compound evidence justify their prioritization.
-- Use [render_network_report.py](scripts/render_network_report.py) to make a standalone, interactive HTML report and a machine-readable JSON network. Supply node and edge tables rather than hand-drawing a network.
+- Use [render_network_report.py](scripts/render_network_report.py) to make a standalone, interactive HTML report and a machine-readable JSON network. Supply node and edge tables rather than hand-drawing a network. If the evidence screen yields no eligible network, run the renderer without node/edge inputs so it records the empty-state outcome instead of omitting the HTML report.
 
 ### 5. Interpret pathways and biological context
 
@@ -79,6 +80,19 @@ Read [evidence-model.md](references/evidence-model.md) before scoring, filtering
 ### 7. Report conclusions, negative findings, and validation
 
 Deliver `project_manifest.json`, `component_evidence.csv`, `target_evidence.csv`, `nodes.csv`, `edges.csv`, `network.json`, `network_report.html`, and a concise narrative.
+
+## Required HTML report and verification
+
+Make `network_report.html` the primary evidence handoff, not a supplementary graphic. Include the network with entity and evidence-tier legend, searchable/filterable entities, graph summary and connectedness, source/tier composition, all available derived observations, selected-node evidence details, provenance/share URLs, and explicit interpretation limits. Do not hide relevant dimensions behind a single chart or deliver an unexplained hairball. Keep conclusions clearly labelled as curated, predicted, computational, or unknown.
+
+Run the renderer as the final artifact-generation step, then verify the exact file exists before responding:
+
+```powershell
+python scripts/render_network_report.py --nodes <analysis-root>/nodes.csv --edges <analysis-root>/edges.csv --output-dir <analysis-root>/report --title "Evidence-graded network for <question>"
+if (-not (Test-Path <analysis-root>/report/network_report.html)) { throw "Network HTML report was not generated" }
+```
+
+For a documented empty or negative result, omit `--nodes` and `--edges` but still run the command with `--output-dir` and `--title`. Never invent placeholder nodes or edges to make the visual look complete. Link the generated HTML in the final handoff together with the manifest and raw tables.
 
 State separately:
 

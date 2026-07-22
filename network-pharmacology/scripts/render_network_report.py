@@ -3,8 +3,8 @@
 
 Input nodes require: id, type. Optional: label, evidence_tier, score, description.
 Input edges require: source, target. Optional: evidence_type, evidence_tier, weight,
-direction, source_ref. The script writes network.json and a self-contained HTML page that
-loads Cytoscape.js from a public CDN when opened.
+direction, source_ref. The script always writes network.json and network_report.html. It
+also renders a transparent empty-state report when no eligible nodes or edges were produced.
 """
 
 from __future__ import annotations
@@ -99,10 +99,15 @@ def build_network(nodes: list[dict[str, str]], edges: list[dict[str, str]]) -> t
 
     type_counts = Counter((node.get("type") or "other").lower() for node in nodes)
     tier_counts = Counter((edge.get("evidence_tier") or "unknown") for edge in edges)
+    source_counts = Counter((edge.get("source_ref") or edge.get("source") or "unspecified") for edge in edges)
+    evidence_type_counts = Counter((edge.get("evidence_type") or "unknown") for edge in edges)
+    leading_nodes = sorted(nodes, key=lambda node: (-degree[node["id"]], node.get("label") or node["id"]))[:10]
     metrics = {
         "nodes": len(nodes), "edges": len(edges), "components": len(set(components)),
         "isolated_nodes": sum(1 for node in nodes if degree[node["id"]] == 0),
         "node_types": dict(sorted(type_counts.items())), "edge_evidence_tiers": dict(sorted(tier_counts.items())),
+        "edge_sources": dict(sorted(source_counts.items())), "edge_evidence_types": dict(sorted(evidence_type_counts.items())),
+        "leading_nodes_by_degree": [{"id": node["id"], "label": node.get("label") or node["id"], "degree": degree[node["id"]]} for node in leading_nodes],
     }
     return {"elements": elements, "metrics": metrics}, metrics
 
@@ -113,13 +118,13 @@ def render_html(network: dict, title: str) -> str:
     return f"""<!doctype html>
 <html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">
 <title>{safe_title}</title><script src=\"https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.30.4/cytoscape.min.js\"></script>
-<style>body{{margin:0;font:14px system-ui,sans-serif;color:#1a202c}}header{{padding:14px 18px;background:#102a43;color:#fff}}#layout{{display:grid;grid-template-columns:310px 1fr;height:calc(100vh - 73px)}}aside{{padding:16px;overflow:auto;border-right:1px solid #d9e2ec}}#cy{{min-width:0;background:#f8fafc}}label{{display:block;margin:12px 0 4px;font-weight:600}}input,select{{width:100%;box-sizing:border-box;padding:7px}}.metric{{background:#edf2f7;padding:7px;margin:5px 0;border-radius:4px}}.hint{{color:#52606d;line-height:1.4}}</style>
+<style>body{{margin:0;font:14px system-ui,sans-serif;color:#1a202c}}header{{padding:14px 18px;background:#102a43;color:#fff}}#layout{{display:grid;grid-template-columns:310px 1fr;height:calc(100vh - 73px)}}aside{{padding:16px;overflow:auto;border-right:1px solid #d9e2ec}}#cy{{min-width:0;background:#f8fafc}}label{{display:block;margin:12px 0 4px;font-weight:600}}input,select{{width:100%;box-sizing:border-box;padding:7px}}.metric{{background:#edf2f7;padding:7px;margin:5px 0;border-radius:4px}}.hint{{color:#52606d;line-height:1.4}}.outcome{{padding:9px;background:#fff8db;border:1px solid #e9c46a;border-radius:4px;color:#6b4f00}}</style>
 </head><body><header><strong>{safe_title}</strong> — interactive evidence network</header><div id=\"layout\"><aside>
 <label for=\"search\">Find node</label><input id=\"search\" placeholder=\"name or ID\"><label for=\"type\">Entity type</label><select id=\"type\"><option value=\"\">All types</option></select>
 <label for=\"tier\">Minimum edge tier</label><select id=\"tier\"><option value=\"\">All evidence</option><option value=\"1\">Tier 1</option><option value=\"2\">Tier 2</option><option value=\"3\">Tier 3</option></select>
-<h3>Network summary</h3><div id=\"metrics\"></div><p class=\"hint\">Node color = entity type. Edge opacity declines from Tier 1 to Tier 3. Click an entity to inspect its attributes. Use this report for exploration; create a filtered static figure for publication.</p><pre id=\"detail\" class=\"hint\"></pre>
+<h3>Network summary</h3><div id=\"metrics\"></div><p id=\"outcome\" class=\"outcome\" hidden></p><p class=\"hint\">Node color = entity type. Edge opacity declines from Tier 1 to Tier 3. Click an entity to inspect its attributes. Use this report for exploration; create a filtered static figure for publication.</p><pre id=\"detail\" class=\"hint\"></pre>
 </aside><main id=\"cy\"></main></div><script>const network={payload}; const types=[...new Set(network.elements.filter(x=>!x.data.source).map(x=>x.data.type))].sort(); const typeSelect=document.getElementById('type'); types.forEach(t=>typeSelect.add(new Option(t,t)));
-const metrics=network.metrics; document.getElementById('metrics').innerHTML=Object.entries(metrics).map(([k,v])=>`<div class=\"metric\"><b>${{k.replaceAll('_',' ')}}:</b> ${{typeof v==='object'?JSON.stringify(v):v}}</div>`).join('');
+const metrics=network.metrics; document.getElementById('metrics').innerHTML=Object.entries(metrics).map(([k,v])=>`<div class=\"metric\"><b>${{k.replaceAll('_',' ')}}:</b> ${{typeof v==='object'?JSON.stringify(v):v}}</div>`).join(''); if(!metrics.nodes||!metrics.edges){{const outcome=document.getElementById('outcome');outcome.hidden=false;outcome.textContent='No eligible evidence network was produced. This is a recorded negative or partial result, not evidence that no biological relationship exists.';}}
 const cy=cytoscape({{container:document.getElementById('cy'),elements:network.elements,style:[{{selector:'node',style:{{'background-color':'data(color)','label':'data(label)','font-size':10,'text-wrap':'wrap','text-max-width':'80px','width':'mapData(degree,0,20,24,58)','height':'mapData(degree,0,20,24,58)','color':'#1a202c','text-outline-color':'#fff','text-outline-width':2}}}},{{selector:'edge',style:{{'width':'mapData(weight,0,5,1,5)','line-color':'#52606d','curve-style':'bezier','target-arrow-shape':'triangle','target-arrow-color':'#52606d','opacity':0.65}}}},{{selector:'edge[tier = "2"]',style:{{opacity:0.45,'line-style':'dashed'}}}},{{selector:'edge[tier = "3"]',style:{{opacity:0.25,'line-style':'dotted'}}}},{{selector:'.hidden',style:{{display:'none'}}}},{{selector:':selected',style:{{'border-width':4,'border-color':'#f6ad55'}}}}],layout:{{name:'cose',animate:false,padding:30}}}});
 function refresh(){{const query=document.getElementById('search').value.toLowerCase(), type=typeSelect.value, tier=document.getElementById('tier').value; cy.elements().removeClass('hidden'); cy.nodes().forEach(n=>{{const ok=(!query||(n.data('label')+' '+n.id()).toLowerCase().includes(query))&&(!type||n.data('type')===type);if(!ok)n.addClass('hidden')}});cy.edges().forEach(e=>{{const edgeTier=String(e.data('tier'));if((tier&&edgeTier>tier)||e.source().hasClass('hidden')||e.target().hasClass('hidden'))e.addClass('hidden')}});}}
 document.getElementById('search').oninput=refresh;typeSelect.onchange=refresh;document.getElementById('tier').onchange=refresh;cy.on('tap','node',e=>document.getElementById('detail').textContent=JSON.stringify(e.target.data(),null,2));</script></body></html>"""
@@ -127,19 +132,24 @@ document.getElementById('search').oninput=refresh;typeSelect.onchange=refresh;do
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--nodes", required=True, type=Path)
-    parser.add_argument("--edges", required=True, type=Path)
+    parser.add_argument("--nodes", type=Path, help="Optional CSV/TSV nodes table. Omit only for a documented empty/negative result.")
+    parser.add_argument("--edges", type=Path, help="Optional CSV/TSV edges table. Omit only for a documented empty/negative result.")
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--title", default="Network pharmacology evidence network")
     args = parser.parse_args()
-    nodes, edges = read_table(args.nodes), read_table(args.edges)
-    require_columns(nodes, ("id", "type"), "nodes table")
-    require_columns(edges, ("source", "target"), "edges table")
+    nodes = read_table(args.nodes) if args.nodes else []
+    edges = read_table(args.edges) if args.edges else []
+    if args.nodes:
+        require_columns(nodes, ("id", "type"), "nodes table")
+    if args.edges:
+        require_columns(edges, ("source", "target"), "edges table")
     network, metrics = build_network(nodes, edges)
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    (args.output_dir / "network.json").write_text(json.dumps(network, ensure_ascii=False, indent=2), encoding="utf-8")
-    (args.output_dir / "network_report.html").write_text(render_html(network, args.title), encoding="utf-8")
-    print(json.dumps(metrics, ensure_ascii=False, indent=2))
+    network_path = args.output_dir / "network.json"
+    report_path = args.output_dir / "network_report.html"
+    network_path.write_text(json.dumps(network, ensure_ascii=False, indent=2), encoding="utf-8")
+    report_path.write_text(render_html(network, args.title), encoding="utf-8")
+    print(json.dumps({**metrics, "network_json": str(network_path), "html_report": str(report_path)}, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":
