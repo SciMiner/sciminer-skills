@@ -9,6 +9,8 @@ import re
 from collections import Counter
 from pathlib import Path
 
+from html_dashboard import write_dashboard
+
 PAIR_PATTERNS = [
     re.compile(r"^\s*[-*+]?\s*([^:：|]{1,100}?)\s*[:：]\s*([0-9][0-9,]*)\s*$"),
     re.compile(r"^\s*[-*+]?\s*([^()（）|]{1,100}?)\s*[（(]\s*([0-9][0-9,]*)\s*[)）]\s*$"),
@@ -81,6 +83,21 @@ def main() -> None:
     report = {"source_root": str(args.root.resolve()), "index_files": [str(path) for path in indices], "index_count": len(indices), "aggregate_label_counts": [{"label": label, "count": count} for label, count in ranking], "per_index": per_index, "notes": ["Counts are parser-detected Markdown label/count pairs. Inspect index.md structure before interpreting mixed metrics as one distribution.", "Repeated labels are summed across index files."]}
     (outdir / "weekly_summary.json").write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
     svg_bars("Top detected index counts", ranking, outdir / "top_index_counts.svg")
+    write_dashboard(
+        outdir / "patent_trends.html",
+        title="Patent-Mol-Wiki index trends",
+        metrics=[
+            {"label": "Index files", "value": len(indices)},
+            {"label": "Detected labels", "value": len(ranking)},
+            {"label": "Aggregate detected counts", "value": f"{sum(aggregate.values()):,}"},
+        ],
+        charts=[{
+            "title": "Top detected index counts",
+            "items": [{"label": label, "count": count} for label, count in ranking],
+            "note": "Counts are parser-detected Markdown label/count pairs; do not combine unlike metrics as a distribution.",
+        }],
+        source_note="Source: local Patent-Mol-Wiki index.md. This offline file embeds only the derived aggregate data.",
+    )
     print(json.dumps({"index_count": len(indices), "labels": len(ranking), "outdir": str(outdir)}, ensure_ascii=False))
 
 

@@ -6,6 +6,8 @@ import argparse, csv, html, json, re
 from collections import Counter
 from pathlib import Path
 
+from html_dashboard import write_dashboard
+
 STOP = set("the and for with from into using use method methods composition compositions treatment therapy therapeutic thereof of in to a an is are by as on or at that this these new novel".split())
 MODALITIES = {"antibody": ["antibody", "antibod"], "small molecule": ["compound", "inhibitor", "agonist", "antagonist"], "cell therapy": ["cell therapy", "t cell", "car-t"], "gene/rna": ["gene therapy", "rna", "nucleic acid", "oligonucleotide"], "vaccine": ["vaccine", "immunization"], "biologic": ["protein", "peptide", "enzyme"]}
 DISEASES = {"oncology": ["cancer", "tumor", "tumour", "oncolog", "carcinoma", "leukemia"], "infectious disease": ["virus", "viral", "bacteria", "infection", "antiviral"], "immunology/inflammation": ["immune", "immun", "inflamm", "autoimmune"], "metabolic": ["diabetes", "obesity", "metabolic"], "neurology": ["neuro", "alzheimer", "parkinson", "brain"], "cardiovascular": ["cardio", "heart", "vascular"]}
@@ -40,6 +42,21 @@ def main() -> None:
     report = {"source_root": str(args.root.resolve()), "patent_count": len(records), "modality_keyword_counts": modalities, "disease_keyword_counts": diseases, "top_title_terms": words.most_common(30), "category_note": "Categories may overlap and indicate keyword mentions, not claim-level classification."}
     (out / "weekly_overview.json").write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
     bar("Recent-week modality keyword mentions", modalities, out / "modality_mentions.svg"); bar("Recent-week disease keyword mentions", diseases, out / "disease_mentions.svg")
+    write_dashboard(
+        out / "patent_trends.html",
+        title="Patent-Mol-Wiki weekly overview",
+        metrics=[
+            {"label": "Patent folders", "value": len(records)},
+            {"label": "Modality categories with mentions", "value": len(modalities)},
+            {"label": "Disease categories with mentions", "value": len(diseases)},
+        ],
+        charts=[
+            {"title": "Modality keyword mentions", "items": [{"label": k, "count": v} for k, v in modalities.most_common()], "note": report["category_note"]},
+            {"title": "Disease keyword mentions", "items": [{"label": k, "count": v} for k, v in diseases.most_common()], "note": report["category_note"]},
+            {"title": "Top title terms", "items": [{"label": k, "count": v} for k, v in words.most_common(30)], "note": "Terms are extracted from detected index headings and exclude a small transparent stop-word list."},
+        ],
+        source_note="Source: extracted local Patent-Mol-Wiki index.md. This offline file embeds only derived metadata and keyword counts.",
+    )
     print(json.dumps({"patent_count": len(records), "outdir": str(out)}, ensure_ascii=False))
 
 if __name__ == "__main__": main()
