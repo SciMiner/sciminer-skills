@@ -35,13 +35,29 @@ Never begin a targeted question by opening every patent text file. Search filena
    python scripts/index_stats.py <data-root> --outdir <analysis-root>
    ```
 
-3. Use the generated aggregate counts to describe patent volume, targets, diseases, organizations, inventors, modalities/technical fields, patent types, and leading ranked categories when those fields are present. Compare with the immediately preceding period only if its package exists and has compatible index fields.
+3. Use the generated aggregate counts to describe patent volume, targets, diseases, applicants/assignees, inventors, modalities/technical fields, patent types, and leading ranked categories when those fields are present. Keep applicants and inventors separate. Compare with the immediately preceding period only if its package exists and has compatible index fields.
 4. To explain a leading category, search it with `scripts/search_wiki.py` and read the matched entries. Do not infer a trend simply because a keyword appears many times in boilerplate.
 5. Deliver: coverage and collection time; headline numbers; notable concentrations/new entities; `patent_trends.html`; 3–5 evidence-backed observations; and exclusions/uncertainties. Link every conclusion to an index metric or listed patent identifiers. The HTML must embed only derived results and identify its source and caveats.
 
 ## HTML visualization standard
 
-Use [analysis_recent_week_patent_trends_report.html](references/analysis_recent_week_patent_trends_report.html) as the sole visualization and layout reference. Keep its report title and coverage metadata, headline metrics, visual-analysis section, inventor-distribution section, evidence-backed observations, noteworthy-theme cards, source/provenance, and interpretation limits. This is a presentation report, not a patent retrieval interface: do not include patent-evidence tables, search boxes, filters, or other lookup controls. Use only local, derived data in the file and never fabricate observations, inventor names or counts, labels, patent identifiers, classifications, or period comparisons. If inventor metadata is absent or incomplete, show that limitation in the inventor-distribution section instead of estimating a distribution.
+Create a standalone `patent_trends.html` whose information hierarchy and styling fit the query and the available evidence. Use `scripts/html_dashboard.py` when its report-oriented shell is useful, but customize its composition and CSS or hand-author a different accessible, responsive visualization when that communicates the results better. Do not treat any bundled HTML as a fixed layout or visual reference.
+
+Use the same language as the user's query throughout the generated HTML, including the document title, `lang` attribute, section headings, chart labels and tooltips, captions, observations, limitations, empty states, and provenance. Preserve patent identifiers, organization names, gene/target symbols, and technical terms when translation would reduce precision. For mixed-language queries, follow the language used for the request itself unless the user asks for another language. Pass localized copy and the matching BCP 47 language tag to `write_dashboard`; do not leave renderer fallback text in another language.
+
+Choose the number and order of metrics, charts, observations, and theme cards based on the evidence instead of padding the report to a fixed composition. Include interpretation limits and source/provenance in every report. When a useful requested category is unavailable, state the missing-data limitation rather than inventing values. This is a presentation report, not a patent retrieval interface: do not include patent-evidence tables, search boxes, filters, or other lookup controls.
+
+For renderer-based reports, prepare a JSON payload containing localized `title`, `subtitle`, `metadata`, `metrics`, `charts`, `insights`, `focus_items`, `limitations`, `applicant_note`, `source_note`, and every `section_labels` value, then run:
+
+```powershell
+python scripts/html_dashboard.py --payload <localized-report.json> --out <analysis-root>/patent_trends.html --language <query-language-tag>
+```
+
+Use `--custom-css <css-file>` when the report needs styling beyond the default shell. Inspect the finished file for stray fallback-language text before delivery.
+
+Use only local, derived data and never fabricate observations, applicant names or counts, labels, patent identifiers, classifications, or period comparisons. Do not relabel inventor names as applicants. If applicant metadata is absent or incomplete, show that limitation in the applicant-distribution section instead of estimating a distribution.
+
+Treat applicant entity resolution as a documented analysis step. Merge bilingual names, subsidiaries, abbreviations, or corporate variants only when the corpus or reliable evidence supports the mapping; preserve the raw labels and mapping in the analysis workspace. Otherwise keep the labels separate and state that the distribution is not entity-resolved.
 
 ## Targeted retrieval
 
@@ -74,4 +90,4 @@ If `SCIMINER_API_KEY` is unavailable at runtime, stop and report that the gatewa
 
 ## Patent-per-folder package layout
 
-Some provider downloads contain one `index.md` per patent (`profile: patmap-wiki-data-v1`) rather than a dashboard index with precomputed categories. In that layout, count the patent folders and run `scripts/summarize_wiki.py <wiki-root> --outdir <analysis-root>` for a reproducible overview. It produces patent titles, transparent overlapping modality/disease keyword counts, inventor counts when inventor metadata is present, and `patent_trends.html`. Do not represent these keyword counts as claim-level classifications or target annotations. Use `scripts/search_wiki.py` followed by claim inspection for a specific target, disease, company, or structure question.
+Some provider downloads contain one `index.md` per patent (`profile: patmap-wiki-data-v1`) rather than a dashboard index with precomputed categories. In that layout, count the patent folders and run `scripts/summarize_wiki.py <wiki-root> --outdir <analysis-root>` for a reproducible overview. It produces patent titles, transparent overlapping modality/disease keyword counts, applicant counts when explicitly labeled metadata is present, and `patent_trends.html`. Do not represent these keyword counts as claim-level classifications or target annotations. Use `scripts/search_wiki.py` followed by claim inspection for a specific target, disease, company, or structure question.
