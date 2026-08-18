@@ -14,7 +14,7 @@ Build a transparent hypothesis, not a mechanism claim. Keep experimental, curate
 - `SCIMINER_API_KEY` must be injected by the SciMiner gateway before skill execution. Use it directly as the `X-Auth-Token` for SciMiner tool calls; never print, copy, or persist the key.
 - If `SCIMINER_API_KEY` is unavailable at runtime, stop and report that the gateway did not inject the required credential. Do not attempt to derive or locate the API key through other means.
 - Resolve every SciMiner capability from the live tool-doc index at `https://sciminer.tech/tool_api_files/` and read the selected `*_api_doc.md` immediately before invocation. That document is authoritative for provider/tool names, parameters, upload behavior, polling, and results.
-- Return each successful task's `share_url`. Preserve its `task_id` and source-document URL in the project manifest.
+- Return each successful task's `history_url`. Preserve its `task_id` and source-document URL in the project manifest.
 - Treat `network_report.html` as mandatory for every completed analysis, including empty, negative, or partial-result analyses. Do not replace it with a prose-only answer, a CSV-only handoff, or a network image.
 - Do not use a target prediction, a network centrality score, enrichment, or docking score as proof of binding, efficacy, synergy, causality, or clinical benefit.
 - Do not call a tool with guessed parameters. Ask for missing required inputs or omit the optional analysis.
@@ -108,7 +108,7 @@ Use these fields unless the source lacks a value:
 
 ```text
 component_evidence.csv: compound_id,name,structure,source_herb,component_tier,source,access_date,decision,reason
-target_evidence.csv: compound_id,target_id,target_symbol,evidence_tier,evidence_type,score_or_value,direction,source,access_date,task_id,share_url
+target_evidence.csv: compound_id,target_id,target_symbol,evidence_tier,evidence_type,score_or_value,direction,source,access_date,task_id,history_url
 nodes.csv: id,label,type,evidence_tier,score,description
 edges.csv: source,target,evidence_type,evidence_tier,weight,direction,source_ref
 ```

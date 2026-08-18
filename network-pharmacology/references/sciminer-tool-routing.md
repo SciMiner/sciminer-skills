@@ -20,6 +20,6 @@ Resolve each tool dynamically from the live index. Tool availability and exact p
 3. Use the gateway-injected `SCIMINER_API_KEY` directly as the `X-Auth-Token`. If it is unavailable, stop and report that the gateway did not inject it; do not derive or locate the key elsewhere.
 4. Upload required files using the documented upload field, then place returned `file_id` values in documented parameters.
 5. Submit exactly the documented payload and poll exactly as documented.
-6. Save only non-secret task metadata, result summary, source-doc URL, `task_id`, and `share_url` in the project manifest.
+6. Save only non-secret task metadata, result summary, source-doc URL, `task_id`, and `history_url` in the project manifest.
 
 If the tool is absent, ambiguous, or requires a parameter the user did not supply, stop that lane and state the missing requirement. Do not substitute a different platform or invent values.

@@ -14,7 +14,7 @@ matching Markdown file, reads the document, and writes or runs invocation code
 from the selected document's exact fields.
 
 SciMiner calls must use the runtime `SCIMINER_API_KEY` as the `X-Auth-Token`,
-and user-facing summaries must include the returned `share_url` for each
+and user-facing summaries must include the returned `history_url` for each
 successful task.
 
 ## When to use this skill
@@ -91,7 +91,7 @@ inside the skill or switch to other tools or services.
   content type, and parameter names from the selected doc, following the
   document's example submission flow.
 8. Poll for the task result.
-9. Return the `share_url` in the final user-facing summary.
+9. Return the `history_url` in the final user-facing summary.
 
 Write the invocation code directly from the selected Markdown document's base
 information block, parameter table, file-upload instructions, and example code.
@@ -114,7 +114,7 @@ Do not apply a shared invocation template in this skill.
   "status": "SUCCESS",
   "result": {"...": "..."},
   "task_id": "xxx",
-  "share_url": "https://sciminer.tech/share?id=xxx&type=API_TOOL"
+  "history_url": "https://sciminer.tech/utility/history/result/APITool?id=xxx"
 }
 ```
 
@@ -122,11 +122,11 @@ Do not apply a shared invocation template in this skill.
 
 - Cite the selected Markdown doc under `https://sciminer.tech/tool_api_files/`
   as the payload source in your summary.
-- Attach the `share_url` of every successful task at the end of the response so
+- Attach the `history_url` of every successful task at the end of the response so
   the user can view the online result.
-- If polling reaches 600 seconds and the task is still running, stop polling and
-  return the current `task_id` and `share_url` so the user can check later.
-- Do not return raw file-download links when a `share_url` is available.
+- If polling reaches 1800 seconds and the task is still running, stop polling and
+  return the `history_url` so the user can check later.
+- Do not return raw file-download links when a `history_url` is available.
 - Do not expose the API key in code snippets, logs, or summaries.
 
 ## Notes
@@ -138,5 +138,5 @@ Do not apply a shared invocation template in this skill.
   exists.
 - When the user asks to "use tool X", the first action is to resolve and read
   tool X's Markdown doc, not to infer parameters from memory.
-- This skill defines its own credential and `share_url` handling rules and does
+- This skill defines its own credential and `history_url` handling rules and does
   not rely on another skill document.

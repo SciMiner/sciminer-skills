@@ -96,7 +96,7 @@ section, ask for correction or drop it with an explanation.
 7. For multi-step workflows, invoke tools in dependency order, passing completed
    structures or sequences from one task into the next only after the upstream
    task succeeds.
-8. Poll the task result and return the `share_url` in the final user-facing
+8. Poll the task result and return the `history_url` in the final user-facing
    summary.
 
 ## File upload rules
@@ -116,7 +116,7 @@ section, ask for correction or drop it with an explanation.
     "status": "SUCCESS",
     "result": {...},
     "task_id": "xxx",
-    "share_url": "https://sciminer.tech/share?id=<task_id>&type=API_TOOL"
+    "history_url": "https://sciminer.tech/utility/history/result/APITool?id=<task_id>"
 }
 ```
 
@@ -195,5 +195,5 @@ section, ask for correction or drop it with an explanation.
     sequences that satisfy the user's request.
 - For BindCraft-family workflows, ask for target chains and hotspot residues if
     the user provides only a target structure.
-- **Important**: When summarizing results to users, attach the `share_url` links of every successful task at the end so that users can view the online results of each invoked tool, rather than showing the file download links.
-- For long-running tasks without a fixed ETA, poll for no more than 6000 seconds; if the task is still running, stop polling and return the current `task_id` and `share_url` so the user can check later.
+- **Important**: When summarizing results to users, attach the `history_url` links of every successful task at the end so that users can view the online results of each invoked tool, rather than showing the file download links.
+- For long-running tasks without a fixed ETA, poll for no more than 1800 seconds; if the task is still running, stop polling and return the `history_url` so the user can check later.

@@ -165,7 +165,7 @@ section, ask for correction or drop it with an explanation.
     base-information block, parameter table, file-upload instructions, and
     example code. Do not apply a shared invocation template or local registry
     abstraction in this skill.
-14. Poll the task result and return the `share_url` in the final user-facing
+14. Poll the task result and return the `history_url` in the final user-facing
     summary.
 
 ## Missing-input completion rules
@@ -209,7 +209,7 @@ section, ask for correction or drop it with an explanation.
     "status": "SUCCESS",
     "result": {...},
     "task_id": "xxx",
-    "share_url": "https://sciminer.tech/share?id=<task_id>&type=API_TOOL"
+    "history_url": "https://sciminer.tech/utility/history/result/APITool?id=<task_id>"
 }
 ```
 
@@ -239,9 +239,9 @@ section, ask for correction or drop it with an explanation.
 - Use the selected Markdown doc to determine PBCNet `label_list` formatting,
   Gnina pocket specification, file inputs, parameter placement, and any
   tool-specific submission details.
-- Important: when summarizing results to users, attach the `share_url` links of
+- Important: when summarizing results to users, attach the `history_url` links of
   every successful task at the end so that users can view the online results,
   rather than showing file download links.
-- For long-running tasks without a fixed ETA, poll for no more than 6000
-  seconds; if the task is still running, stop polling and return the current
-  `task_id` and `share_url` so the user can check later.
+- For long-running tasks without a fixed ETA, poll for no more than 1800
+  seconds; if the task is still running, stop polling and return the
+  `history_url` so the user can check later.
