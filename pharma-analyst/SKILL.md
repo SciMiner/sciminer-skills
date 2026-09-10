@@ -5,7 +5,7 @@ description: Produce current, evidence-graded pharmaceutical and biotechnology a
 
 # Pharma Analyst
 
-Build decision-useful biopharma analysis that keeps verified facts, company claims, analyst interpretation, and speculation visibly separate. Default to the user's language and requested depth.
+Build decision-useful biopharma analysis that keeps verified facts, company claims, analyst interpretation, and speculation visibly separate. Default to the user's language. Unless the user explicitly requests a brief answer, provide a substantial analysis with enough evidence and explanation to support the conclusion.
 
 ## Core contract
 
@@ -88,8 +88,13 @@ Explain what would confirm, weaken, or falsify the thesis. Use ranges and sensit
 
 ## Output rules
 
+- Organize substantial outputs as: executive view, scope and cutoff, evidence-based analysis, risks and alternative interpretations, catalysts or next steps, sources, and limitations. Use clear numbered headings for longer reports.
+- Prefer tables for pipelines, trial designs and results, competitors, financing, evidence grades, risks, catalysts, valuation assumptions, and source registers. Use prose to explain causality, nuance, and the investment or strategic implications of the tabulated facts.
+- Do not produce a table-only report. Introduce each major table with the question it answers and follow it with the key interpretation.
+- Make standard and deep-dive reports substantial rather than summary-only. Cover the material modules, quantify claims where possible, and explain both supporting and disconfirming evidence. Shorten only when the user asks for brevity or the question is genuinely narrow.
 - Put an `As of` date near the top.
-- Give inline citations or footnotes close to the supported claims; include direct links when available.
+- Give inline citations or footnotes close to every material factual claim; include direct links when available. Add a source register for substantial reports with source, date, evidence type, supported claim, and data cutoff.
+- Cite primary sources first. Include secondary sources only when they add context, reveal a discrepancy, or no primary source is available, and label that limitation.
 - Normalize currencies, units, stages, endpoint names, and trial status before comparison.
 - Show denominators, doses, follow-up, confidence intervals, and discontinuations when available.
 - Label cross-trial comparisons as non-randomized and discuss population, endpoint, timing, and background-therapy differences.
@@ -104,9 +109,10 @@ Before delivery, verify:
 - Every stage, trial status, approval, readout, financing, and leadership claim is current to the cutoff.
 - Asset aliases and trial identifiers map correctly.
 - Numerical claims reconcile with the cited source and use the correct population and time point.
+- Tables contain source citations or clearly map to cited surrounding text; no important table entry is orphaned from its evidence.
+- The response is sufficiently developed for the requested decision and does not collapse a multi-part diligence request into a brief synopsis.
 - Facts, company claims, inferences, and assumptions are visually distinguishable.
 - The report states missing data and material contradictory evidence.
 - No preclinical result is phrased as expected human efficacy or safety.
 - Valuation assumptions are traceable and sensitivity-tested.
 - The conclusion can change if the stated falsifiers occur.
-

@@ -1,6 +1,6 @@
 # Pharma analyst report template
 
-Use this outline selectively. Omit empty sections and lead with what matters to the user's decision.
+Use this outline selectively. Omit empty sections and lead with what matters to the user's decision. Unless the user asks for a brief note, write a substantial report: combine structured tables with interpretive prose, cover material counterevidence, and cite sources throughout.
 
 ## Header
 
@@ -26,24 +26,35 @@ Include a compact dashboard when useful:
 | Metric | Current view | Evidence grade | Why it matters |
 |---|---|---|---|
 
+Follow the dashboard with a short thesis paragraph explaining how the key evidence connects to the conclusion.
+
 ## 1. Company and strategy
 
-- Identity, ownership, leadership, financing, runway
-- Business model and strategic positioning
-- Partnerships and rights
-- Timeline of value-inflecting events
+| Topic | Current facts | Analyst interpretation | Evidence/source |
+|---|---|---|---|
+| Identity and ownership | | | |
+| Leadership | | | |
+| Financing and runway | | | |
+| Partnerships and rights | | | |
+| Strategic positioning | | | |
+
+Add a milestone table when company history or value-inflecting events are material.
 
 ## 2. Platform
 
-- Architecture and claimed advantage
-- Evidence ladder achieved
-- Platform-to-asset translation
-- Reproducibility, scalability, and limitations
+| Dimension | Company claim | Supporting evidence | Limitation | Grade/source |
+|---|---|---|---|---|
+| Architecture and advantage | | | | |
+| Prospective validation | | | | |
+| Platform-to-asset translation | | | | |
+| Reproducibility and scale | | | | |
+
+Explain whether the evidence validates the platform itself or only an individual asset.
 
 ## 3. Pipeline
 
-| Asset | Target/MoA | Modality | Indication | Verified stage | Trial ID | Next catalyst |
-|---|---|---|---|---|---|---|
+| Asset | Target/MoA | Modality | Indication | Verified stage | Trial ID | Next catalyst | Source |
+|---|---|---|---|---|---|---|---|
 
 Flag discrepancies between registries and company materials.
 
@@ -63,15 +74,15 @@ Flag discrepancies between registries and company materials.
 
 ### Clinical development
 
-| Item | Detail | Analyst interpretation |
-|---|---|---|
-| Design/population | | |
-| Dose/exposure | | |
-| Endpoints | | |
-| Efficacy | | |
-| Safety | | |
-| Immunogenicity | | |
-| Limitations | | |
+| Item | Detail | Analyst interpretation | Evidence/source |
+|---|---|---|---|
+| Design/population | | | |
+| Dose/exposure | | | |
+| Endpoints | | | |
+| Efficacy | | | |
+| Safety | | | |
+| Immunogenicity | | | |
+| Limitations | | | |
 
 ### Differentiation
 
@@ -88,8 +99,8 @@ Repeat for other material assets at proportionate depth.
 
 ## 5. Competitive landscape
 
-| Therapy | Company | Mechanism | Relevant indication/stage | Key evidence | Differentiation | Limitation |
-|---|---|---|---|---|---|---|
+| Therapy | Company | Mechanism | Relevant indication/stage | Key evidence | Differentiation | Limitation | Source |
+|---|---|---|---|---|---|---|---|
 
 Discuss how the likely standard of care may change before launch.
 
@@ -133,5 +144,11 @@ State at least one falsifier for each central thesis claim.
 ## Sources and limitations
 
 List primary sources first. For each major dataset include publication date and data cutoff. State missing information, source conflicts, and areas based on inference or scenario assumptions.
+
+| # | Source and direct link | Publication/access date | Data cutoff | Evidence type | Claims supported |
+|---|---|---|---|---|---|
+| 1 | | | | | |
+
+Ensure numbered citations or descriptive links in the body map unambiguously to this register. Do not cite a search-results page when the underlying source is available.
 
 Add: `This report is for research purposes and is not medical, legal, patent, or personalized investment advice.`
